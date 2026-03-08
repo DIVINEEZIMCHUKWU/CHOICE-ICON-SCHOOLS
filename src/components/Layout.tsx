@@ -79,9 +79,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between items-center h-16 md:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center text-navy-blue font-bold text-lg md:text-xl group-hover:scale-105 transition-transform">
-                IC
-              </div>
+              <img 
+                src="/Images/Choice Logo.jpg" 
+                alt="The Choice ICON Schools" 
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <span className="font-bold text-base md:text-lg leading-tight tracking-tight">THE CHOICE</span>
                 <span className="font-light text-[10px] md:text-xs tracking-[0.2em] text-sky-blue">ICON SCHOOLS</span>
@@ -170,9 +172,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {/* Brand */}
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center text-navy-blue font-bold text-lg md:text-xl">
-                  IC
-                </div>
+                <img 
+                  src="/Images/Choice Logo.jpg" 
+                  alt="The Choice ICON Schools" 
+                  className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
+                />
                 <div className="flex flex-col">
                   <span className="font-bold text-base md:text-lg leading-tight">THE CHOICE</span>
                   <span className="font-light text-[10px] md:text-xs tracking-[0.2em] text-sky-blue">ICON SCHOOLS</span>

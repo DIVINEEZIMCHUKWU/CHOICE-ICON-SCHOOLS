@@ -43,7 +43,7 @@ export default function About() {
             <div className="relative">
               <div className="absolute inset-0 bg-sky-blue/10 rounded-2xl transform rotate-3"></div>
               <img 
-                src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop" 
+                src="/Images/13.jpg" 
                 alt="School Building" 
                 className="relative rounded-2xl shadow-xl w-full h-full object-cover"
               />

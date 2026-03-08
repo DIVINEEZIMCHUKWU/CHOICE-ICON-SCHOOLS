@@ -13,22 +13,34 @@ import { Link } from 'react-router-dom';
 export default function Home() {
   const heroSlides = [
     {
-      image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop',
+      image: '/Images/13.jpg',
       title: 'WELCOME TO OUR SCHOOL',
       subtitle: 'Grooming Icons',
       text: 'An Institution with a mandate to steer our young ones away from moral and intellectual decadence.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2070&auto=format&fit=crop',
+      image: '/Images/26.jpg',
       title: 'EXCELLENCE IN EDUCATION',
       subtitle: 'Nigeria British Curriculum',
       text: 'Providing a challenging and rigorous curriculum that helps each student progress.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=2072&auto=format&fit=crop',
+      image: '/Images/0.jpg',
       title: 'MODERN FACILITIES',
       subtitle: 'State of the Art',
       text: 'Equipped with science laboratories, ICT labs, and a serene learning environment.'
+    },
+    {
+      image: '/Images/25.jpg',
+      title: 'QUALITY LEARNING ENVIRONMENT',
+      subtitle: 'Conducive Atmosphere',
+      text: 'Creating an ideal setting for academic excellence and personal growth.'
+    },
+    {
+      image: '/Images/24.jpg',
+      title: 'FUTURE LEADERS',
+      subtitle: 'Building Tomorrow',
+      text: 'Nurturing young minds to become the icons of tomorrow through comprehensive education.'
     }
   ];
 
@@ -52,7 +64,7 @@ export default function Home() {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] lg:h-[700px]">
+      <section className="relative h-[500px] md:h-[600px] lg:h-[700px] bg-navy-blue">
         <Swiper
           modules={[Autoplay, EffectFade, Navigation, Pagination]}
           effect="fade"
@@ -65,11 +77,18 @@ export default function Home() {
           {heroSlides.map((slide, index) => (
             <SwiperSlide key={index}>
               <div className="relative h-full w-full">
-                <div className="absolute inset-0 bg-black/50 z-10" />
+                <div className="absolute inset-0 bg-black/70 z-10" />
                 <img 
                   src={slide.image} 
                   alt={slide.title} 
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center"
+                  style={{ 
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%'
+                  }}
                 />
                 <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
                   <div className="max-w-4xl">
@@ -117,9 +136,9 @@ export default function Home() {
               <div className="relative">
                 <div className="absolute -top-4 -left-4 w-24 h-24 bg-sky-blue/10 rounded-tl-3xl -z-10"></div>
                 <img 
-                  src="https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=2070&auto=format&fit=crop" 
+                  src="/Images/24.jpg" 
                   alt="Students learning" 
-                  className="rounded-2xl shadow-2xl w-full object-cover h-[400px]"
+                  className="rounded-2xl shadow-2xl w-full object-cover h-[400px] scale-105"
                 />
                 <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl max-w-xs hidden md:block">
                   <p className="text-navy-blue font-bold text-base mb-2">"Train up a child..."</p>
@@ -285,7 +304,7 @@ export default function Home() {
               </div>
               <div className="relative h-96 md:h-auto">
                 <img 
-                  src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1974&auto=format&fit=crop" 
+                  src="/Images/PRINCIPAL.jpg" 
                   alt="Principal - Emmanuel M. Odiniya" 
                   className="absolute inset-0 w-full h-full object-cover"
                 />

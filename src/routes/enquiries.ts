@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../db';
+import { sendGeneralEmail } from '../services/email';
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.get('/', (req, res) => {
 });
 
 // Submit enquiry
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { name, phone, email, message, type } = req.body;
   
   if (!name || !message) {
@@ -22,11 +23,28 @@ router.post('/', (req, res) => {
   }
 
   try {
+    // Save to database first
     const stmt = db.prepare('INSERT INTO enquiries (name, phone, email, message, type) VALUES (?, ?, ?, ?, ?)');
     const info = stmt.run(name, phone || '', email || '', message, type || 'General');
     
+    // Send email notification
+    try {
+      await sendGeneralEmail({
+        name: name,
+        phone: phone,
+        email: email,
+        message: message,
+        type: type || 'General'
+      });
+      console.log('Enquiry email notification sent successfully');
+    } catch (emailError) {
+      console.error('Failed to send enquiry email:', emailError);
+      // Continue even if email fails
+    }
+    
     res.status(201).json({ id: info.lastInsertRowid, message: 'Enquiry submitted' });
   } catch (error) {
+    console.error('Error submitting enquiry:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

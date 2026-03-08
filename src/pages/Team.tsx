@@ -1,23 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 export default function Team() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const team = [
     {
       name: 'Emmanuel M. Odiniya',
       role: 'Principal',
-      img: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1974&auto=format&fit=crop'
+      img: '/Images/PRINCIPAL.jpg'
     },
-    // Placeholders for other staff
+    // Academic Staff Members
     {
-      name: 'Academic Staff',
+      name: 'Academic Staff Members',
       role: 'Teaching Staff',
-      img: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop'
+      img: '/Images/31.jpg'
     },
     {
-      name: 'Support Staff',
+      name: 'Academic Staff Members',
+      role: 'Teaching Staff',
+      img: '/Images/Staff ICON.jpg'
+    },
+    // Support Staff Members
+    {
+      name: 'Support Staff Members',
       role: 'Non-Teaching Staff',
-      img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop'
+      img: '/Images/29.jpg'
+    },
+    {
+      name: 'Support Staff Members',
+      role: 'Non-Teaching Staff',
+      img: '/Images/30.jpg'
+    },
+    {
+      name: 'Support Staff Members',
+      role: 'Non-Teaching Staff',
+      img: '/Images/28.jpg'
     }
   ];
 
@@ -40,12 +57,20 @@ export default function Team() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {team.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-shadow group">
-                <div className="h-80 overflow-hidden">
+                <div className="h-80 overflow-hidden relative">
                   <img 
                     src={member.img} 
                     alt={member.name} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                   />
+                  <div className="absolute inset-0 bg-navy-blue/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <button 
+                      onClick={() => setSelectedImage(member.img)}
+                      className="text-white font-bold text-lg border border-white px-6 py-2 rounded-full hover:bg-white hover:text-navy-blue transition-colors"
+                    >
+                      VIEW
+                    </button>
+                  </div>
                 </div>
                 <div className="p-6 text-center">
                   <h3 className="text-lg font-bold text-navy-blue mb-1">{member.name}</h3>
@@ -56,6 +81,30 @@ export default function Team() {
           </div>
         </div>
       </section>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-full">
+            <img 
+              src={selectedImage} 
+              alt="Full size team member image" 
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            <button 
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-900 rounded-full p-2 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

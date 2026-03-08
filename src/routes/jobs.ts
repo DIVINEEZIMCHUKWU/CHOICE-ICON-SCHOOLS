@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import db from '../db';
+import { sendJobApplicationEmail } from '../services/email';
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ router.get('/', (req, res) => {
 });
 
 // Submit job application
-router.post('/', upload.single('cv'), (req, res) => {
+router.post('/', upload.single('cv'), async (req, res) => {
   const { full_name, email, phone, position, cover_letter } = req.body;
   const cv_url = req.file ? `/uploads/cvs/${req.file.filename}` : null;
 
@@ -53,11 +54,29 @@ router.post('/', upload.single('cv'), (req, res) => {
   }
 
   try {
+    // Save to database first
     const stmt = db.prepare('INSERT INTO job_applications (full_name, email, phone, position, cover_letter, cv_url) VALUES (?, ?, ?, ?, ?, ?)');
     const info = stmt.run(full_name, email, phone || '', position, cover_letter || '', cv_url);
     
+    // Send email notification
+    try {
+      await sendJobApplicationEmail({
+        name: full_name,
+        email: email,
+        phone: phone,
+        position: position,
+        coverLetter: cover_letter,
+        cvUrl: cv_url ? `${process.env.APP_URL || 'http://localhost:3000'}${cv_url}` : undefined
+      });
+      console.log('Job application email notification sent successfully');
+    } catch (emailError) {
+      console.error('Failed to send job application email:', emailError);
+      // Continue even if email fails
+    }
+    
     res.status(201).json({ message: 'Application submitted successfully' });
   } catch (error) {
+    console.error('Error submitting job application:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

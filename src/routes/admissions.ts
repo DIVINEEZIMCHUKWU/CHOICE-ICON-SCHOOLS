@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../db';
+import { sendAdmissionEmail } from '../services/email';
 
 const router = express.Router();
 
@@ -14,21 +15,35 @@ router.get('/', (req, res) => {
 });
 
 // Submit admission enquiry
-router.post('/', (req, res) => {
-  const { applicant_name, phone, message } = req.body;
+router.post('/', async (req, res) => {
+  const { applicant_name, phone, message, email } = req.body;
   
   if (!applicant_name || !phone) {
     return res.status(400).json({ message: 'Name and phone are required' });
   }
 
   try {
+    // Save to database first
     const stmt = db.prepare('INSERT INTO admissions (applicant_name, phone, message) VALUES (?, ?, ?)');
     const info = stmt.run(applicant_name, phone, message || '');
     
-    // TODO: Send email notification
+    // Send email notification
+    try {
+      await sendAdmissionEmail({
+        name: applicant_name,
+        phone: phone,
+        message: message || 'No additional message provided',
+        email: email || undefined
+      });
+      console.log('Admission email notification sent successfully');
+    } catch (emailError) {
+      console.error('Failed to send admission email:', emailError);
+      // Continue even if email fails
+    }
     
     res.status(201).json({ id: info.lastInsertRowid, message: 'Admission enquiry submitted' });
   } catch (error) {
+    console.error('Error submitting admission:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
