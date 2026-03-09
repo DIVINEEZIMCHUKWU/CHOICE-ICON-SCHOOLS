@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { Search, Download } from 'lucide-react';
-import SuccessModal from '../components/SuccessModal';
+import SuccessMessage from '../components/SuccessMessage';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export default function Admissions() {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
@@ -10,8 +16,7 @@ export default function Admissions() {
 
   const [trackingId, setTrackingId] = useState('');
   const [trackingStatus, setTrackingStatus] = useState<string | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successEmail, setSuccessEmail] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
   const [successType, setSuccessType] = useState<'Admission' | 'Contact'>('Admission');
 
   const source = watch('source');
@@ -37,10 +42,11 @@ export default function Admissions() {
         throw new Error('Failed to submit enquiry');
       }
 
-      setSuccessEmail(data.email);
       setSuccessType('Admission');
-      setShowSuccessModal(true);
+      setShowSuccess(true);
       reset();
+      // Hide success message after 4 seconds
+      setTimeout(() => setShowSuccess(false), 4000);
     } catch (error) {
       console.error('Error submitting enquiry:', error);
       alert('An error occurred. Please try again.');
@@ -66,10 +72,11 @@ export default function Admissions() {
         throw new Error('Failed to submit feedback');
       }
 
-      setSuccessEmail(data.email);
       setSuccessType('Contact');
-      setShowSuccessModal(true);
+      setShowSuccess(true);
       resetFeedback();
+      // Hide success message after 4 seconds
+      setTimeout(() => setShowSuccess(false), 4000);
     } catch (error) {
       console.error('Error submitting feedback:', error);
       alert('Failed to submit feedback.');
@@ -345,18 +352,7 @@ export default function Admissions() {
         </div>
       </section>
 
-      <SuccessModal
-        isOpen={showSuccessModal}
-        title={successType === 'Admission' ? 'Enquiry Submitted Successfully!' : 'Feedback Sent Successfully!'}
-        message={
-          successType === 'Admission'
-            ? 'Thank you for your interest in joining our school. We have received your enquiry and will contact you soon to discuss the next steps.'
-            : 'Thank you for your feedback. Your message has been received and our team will review it shortly.'
-        }
-        email={successEmail}
-        formType={successType}
-        onClose={() => setShowSuccessModal(false)}
-      />
+      <SuccessMessage isVisible={showSuccess} formType={successType} />
     </>
   );
 }

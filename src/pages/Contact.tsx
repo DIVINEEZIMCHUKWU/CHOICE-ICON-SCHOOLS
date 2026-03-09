@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
-import SuccessModal from '../components/SuccessModal';
+import SuccessMessage from '../components/SuccessMessage';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -12,7 +12,6 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [successEmail, setSuccessEmail] = useState('');
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -37,9 +36,10 @@ export default function Contact() {
       });
 
       if (response.ok) {
-        setSuccessEmail(formData.email);
         setShowSuccess(true);
         setFormData({ name: '', email: '', phone: '', message: '' });
+        // Hide success message after 4 seconds
+        setTimeout(() => setShowSuccess(false), 4000);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to submit form');
@@ -221,14 +221,7 @@ export default function Contact() {
             </button>
           </form>
 
-          <SuccessModal
-            isOpen={showSuccess}
-            title="Message Sent Successfully!"
-            message="Thank you for contacting us. We have received your message and appreciate your interest. Our team will review it and get back to you as soon as possible."
-            email={successEmail}
-            formType="Contact"
-            onClose={() => setShowSuccess(false)}
-          />
+          <SuccessMessage isVisible={showSuccess} formType="Contact" />
         </div>
       </section>
     </>

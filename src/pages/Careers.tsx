@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
-import SuccessModal from '../components/SuccessModal';
+import SuccessMessage from '../components/SuccessMessage';
 
 export default function Careers() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [successEmail, setSuccessEmail] = useState('');
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -37,9 +36,10 @@ Address: ${data.address}
         throw new Error('Failed to submit application');
       }
 
-      setSuccessEmail(data.email);
       setShowSuccess(true);
       reset();
+      // Hide success message after 4 seconds
+      setTimeout(() => setShowSuccess(false), 4000);
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('An error occurred. Please try again.');
@@ -132,14 +132,7 @@ Address: ${data.address}
         </div>
       </section>
 
-      <SuccessModal
-        isOpen={showSuccess}
-        title="Application Submitted Successfully!"
-        message="Thank you for your interest in joining our team at Choice Icon Schools. We have received your application and will review it carefully. If your qualifications match our requirements, we will contact you shortly."
-        email={successEmail}
-        formType="Career"
-        onClose={() => setShowSuccess(false)}
-      />
+      <SuccessMessage isVisible={showSuccess} formType="Career" />
     </>
   );
 }
