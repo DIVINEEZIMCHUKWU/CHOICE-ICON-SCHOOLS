@@ -28,28 +28,25 @@ export default function Careers() {
         return;
       }
 
-      // Upload CV to Supabase Storage
-      const fileName = `${data.email}_${Date.now()}_${cvFile.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('career_cvs')
-        .upload(fileName, cvFile, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      // Upload CV to backend
+      const formData = new FormData();
+      formData.append('cv', cvFile);
+      formData.append('email', data.email);
 
-      if (uploadError) {
-        console.error('CV upload error:', uploadError);
-        setCvUploadError('Failed to upload CV. Please try again.');
+      const uploadResponse = await fetch('http://localhost:5000/api/upload-cv', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        setCvUploadError(errorData.error || 'Failed to upload CV');
         setIsSubmitting(false);
         return;
       }
 
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('career_cvs')
-        .getPublicUrl(fileName);
-
-      const cvUrl = publicUrlData?.publicUrl;
+      const uploadedData = await uploadResponse.json();
+      const cvUrl = uploadedData.cvUrl;
 
       const applicationDetails = `
 Gender: ${data.gender}
@@ -176,8 +173,8 @@ Address: ${data.address}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        if (file.size > 5 * 1024 * 1024) {
-                          setCvUploadError('File size must be less than 5MB');
+                        if (file.size > 500 * 1024) {
+                          setCvUploadError('File size must be less than 500KB');
                           setCvFile(null);
                         } else if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
                           setCvUploadError('Only PDF and Word documents are allowed');
@@ -193,7 +190,7 @@ Address: ${data.address}
                   />
                   <label htmlFor="cv-upload" className="cursor-pointer">
                     <p className="text-gray-700 font-medium">Click to upload or drag and drop</p>
-                    <p className="text-sm text-gray-500 mt-1">PDF or Word document (Max 5MB)</p>
+                    <p className="text-sm text-gray-500 mt-1">PDF or Word document (Max 500KB)</p>
                   </label>
                   {cvFile && <p className="text-green-600 font-medium mt-3">✓ {cvFile.name}</p>}
                 </div>
