@@ -26,25 +26,23 @@ export default function Contact() {
     setError('');
 
     try {
-      const response = await fetch('/api/enquiries', {
+      const response = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          type: 'Contact'
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         setIsSubmitted(true);
         setFormData({ name: '', email: '', phone: '', message: '' });
       } else {
-        throw new Error('Failed to submit form');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit form');
       }
     } catch (error) {
-      setError('An error occurred. Please try again.');
+      setError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

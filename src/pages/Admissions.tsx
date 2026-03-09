@@ -17,17 +17,23 @@ export default function Admissions() {
   const onSubmit = async (data: any) => {
     try {
       const message = `Reason: ${data.reason}\nSource: ${data.source}\nReferral: ${data.referralName || 'N/A'}\nOther Source: ${data.otherSource || 'N/A'}\nNote: ${data.note}`;
-      
-      const { error } = await supabase
-        .from('admissions')
-        .insert([{
-          applicant_name: data.fullName,
+
+      const response = await fetch('http://localhost:5000/api/admission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.fullName,
+          email: data.email || 'noemail@provided.com',
           phone: data.phone,
           message: message,
-          status: 'Pending'
-        }]);
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to submit enquiry');
+      }
 
       setIsSubmitted(true);
       reset();
@@ -39,17 +45,22 @@ export default function Admissions() {
 
   const onSubmitFeedback = async (data: any) => {
     try {
-      const { error } = await supabase
-        .from('enquiries')
-        .insert([{
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           name: data.name,
-          phone: data.phone,
-          email: data.email,
+          email: data.email || 'noemail@provided.com',
+          phone: data.phone || '',
           message: data.message,
-          type: 'Feedback'
-        }]);
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
 
       alert('Feedback submitted successfully!');
       resetFeedback();
