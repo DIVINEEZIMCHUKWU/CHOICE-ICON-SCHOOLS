@@ -23,13 +23,14 @@ router.post('/contact', async (req: Request, res: Response) => {
 
     // Save to Supabase
     const { data, error } = await supabase
-      .from('contact_messages')
+      .from('enquiries')
       .insert([
         {
           name,
           email,
           phone,
           message,
+          type: 'Contact',
           created_at: new Date().toISOString(),
         },
       ])
@@ -72,13 +73,14 @@ router.post('/admission', async (req: Request, res: Response) => {
 
     // Save to Supabase (same table or custom one)
     const { data, error } = await supabase
-      .from('contact_messages')
+      .from('enquiries')
       .insert([
         {
           name,
           email,
           phone,
           message: `ADMISSION INQUIRY: ${message}`,
+          type: 'Admission',
           created_at: new Date().toISOString(),
         },
       ])
@@ -113,7 +115,7 @@ router.get('/admin/messages', async (req: Request, res: Response) => {
   try {
     // TODO: Add authentication middleware to verify admin
     const { data, error } = await supabase
-      .from('contact_messages')
+      .from('enquiries')
       .select('*')
       .order('created_at', { ascending: false });
 
