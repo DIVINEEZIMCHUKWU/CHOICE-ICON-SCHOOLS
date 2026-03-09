@@ -1,16 +1,56 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
+import { Upload } from 'lucide-react';
 import SuccessMessage from '../components/SuccessMessage';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export default function Careers() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvUploadError, setCvUploadError] = useState<string>('');
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
+    setCvUploadError('');
+
     try {
+      if (!cvFile) {
+        setCvUploadError('Please upload your CV');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Upload CV to Supabase Storage
+      const fileName = `${data.email}_${Date.now()}_${cvFile.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('career_cvs')
+        .upload(fileName, cvFile, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error('CV upload error:', uploadError);
+        setCvUploadError('Failed to upload CV. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('career_cvs')
+        .getPublicUrl(fileName);
+
+      const cvUrl = publicUrlData?.publicUrl;
+
       const applicationDetails = `
 Gender: ${data.gender}
 Marital Status: ${data.maritalStatus}
@@ -29,6 +69,7 @@ Address: ${data.address}
           email: data.email,
           phone: data.phone,
           message: applicationDetails,
+          cvUrl: cvUrl,
         }),
       });
 
@@ -38,6 +79,7 @@ Address: ${data.address}
 
       setShowSuccess(true);
       reset();
+      setCvFile(null);
       // Hide success message after 4 seconds
       setTimeout(() => setShowSuccess(false), 4000);
     } catch (error) {
@@ -122,6 +164,40 @@ Address: ${data.address}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <textarea {...register('address', { required: true })} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none"></textarea>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Curriculum Vitae (CV)</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-sky-blue hover:bg-blue-50 transition-colors">
+                  <Upload size={32} className="mx-auto text-gray-400 mb-2" />
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                          setCvUploadError('File size must be less than 5MB');
+                          setCvFile(null);
+                        } else if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
+                          setCvUploadError('Only PDF and Word documents are allowed');
+                          setCvFile(null);
+                        } else {
+                          setCvFile(file);
+                          setCvUploadError('');
+                        }
+                      }
+                    }}
+                    className="hidden"
+                    id="cv-upload"
+                  />
+                  <label htmlFor="cv-upload" className="cursor-pointer">
+                    <p className="text-gray-700 font-medium">Click to upload or drag and drop</p>
+                    <p className="text-sm text-gray-500 mt-1">PDF or Word document (Max 5MB)</p>
+                  </label>
+                  {cvFile && <p className="text-green-600 font-medium mt-3">✓ {cvFile.name}</p>}
+                </div>
+                {cvUploadError && <span className="text-red-500 text-xs mt-2 block">{cvUploadError}</span>}
               </div>
 
               <button type="submit" disabled={isSubmitting} className="w-full bg-sky-blue hover:bg-deep-blue text-white font-bold py-3 rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">

@@ -85,33 +85,40 @@ export default function Admissions() {
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would query the database for the tracking ID.
-    // For now, we'll just simulate it or check if we store tracking IDs.
-    // Since the current schema doesn't strictly have a "tracking_id" column visible in the snippet,
-    // we might skip this or implement a simple lookup if we added a column.
-    // For this update, I'll keep the mock logic or query by phone/name if possible, 
-    // but the user asked for "tracking ID". 
-    // Let's assume for now we just show a message that this feature is coming soon or keep the mock.
-    // Keeping the mock logic for now as per previous implementation, or maybe query by ID if the user enters the row ID.
-    
-    if (trackingId) {
-       // Simple check if it's a number (Row ID)
-       const id = parseInt(trackingId);
-       if (!isNaN(id)) {
-         const { data, error } = await supabase
-           .from('admissions')
-           .select('status')
-           .eq('id', id)
-           .single();
-         
-         if (data) {
-            setTrackingStatus(data.status);
-         } else {
-            setTrackingStatus('Not Found');
-         }
-       } else {
-         setTrackingStatus('Invalid ID');
-       }
+
+    if (!trackingId.trim()) {
+      setTrackingStatus('Please enter a tracking ID');
+      return;
+    }
+
+    try {
+      const id = parseInt(trackingId);
+      if (isNaN(id)) {
+        setTrackingStatus('Invalid ID format');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('enquiries')
+        .select('id, created_at, type')
+        .eq('id', id)
+        .single();
+
+      if (error || !data) {
+        setTrackingStatus('No record found with this ID');
+        return;
+      }
+
+      const submissionDate = new Date(data.created_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+
+      setTrackingStatus(`✓ Received on ${submissionDate} (${data.type})`);
+    } catch (error) {
+      console.error('Tracking error:', error);
+      setTrackingStatus('Error checking status');
     }
   };
 

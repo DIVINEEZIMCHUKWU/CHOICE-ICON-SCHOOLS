@@ -16,6 +16,7 @@ interface CareerFormData {
   email: string;
   phone: string;
   message: string;
+  cvUrl?: string;
 }
 
 // POST /api/contact - Handle contact form submissions
@@ -162,7 +163,7 @@ router.get('/admin/messages', async (req: Request, res: Response) => {
 router.post('/career', async (req: Request, res: Response) => {
   try {
     console.log('📝 Career form received:', { name: req.body.name, email: req.body.email });
-    const { name, email, phone, message }: CareerFormData = req.body;
+    const { name, email, phone, message, cvUrl }: CareerFormData = req.body;
 
     // Validate required fields
     if (!name || !email || !phone || !message) {
@@ -196,7 +197,7 @@ router.post('/career', async (req: Request, res: Response) => {
     // Send emails
     try {
       console.log('📧 Sending admin email to:', process.env.ADMIN_EMAIL);
-      await sendAdminEmail({ name, email, phone, message: `CAREER APPLICATION: ${message}`, type: 'Career' });
+      await sendAdminEmail({ name, email, phone, message: `CAREER APPLICATION: ${message}`, type: 'Career', cvUrl });
       console.log('✅ Admin email sent');
 
       console.log('📧 Sending confirmation email to:', email);

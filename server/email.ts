@@ -12,6 +12,7 @@ interface EmailData {
   phone: string;
   message: string;
   type?: 'Contact' | 'Admission' | 'Career';
+  cvUrl?: string;
 }
 
 export async function sendAdminEmail(data: EmailData) {
@@ -94,6 +95,22 @@ export async function sendAdminEmail(data: EmailData) {
                     <h3>💬 Message</h3>
                     <div class="field-value">${escapeHtml(data.message).replace(/\n/g, '<br>')}</div>
                   </div>
+
+                  ${
+                    data.cvUrl
+                      ? `
+                  <div class="divider"></div>
+                  <div class="form-section">
+                    <h3>📄 Curriculum Vitae</h3>
+                    <div style="text-align: center; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
+                      <a href="${escapeHtml(data.cvUrl)}" style="display: inline-block; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;">
+                        📥 Download CV
+                      </a>
+                    </div>
+                  </div>
+                  `
+                      : ''
+                  }
 
                   <div class="note">
                     💡 Click "Reply" in your email client to respond directly to this sender
