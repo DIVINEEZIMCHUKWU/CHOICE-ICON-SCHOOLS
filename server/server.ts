@@ -24,5 +24,12 @@ app.get('/api/health', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+  console.log('\n========================================');
+  console.log('🚀 CHOICE ICON SCHOOLS API SERVER');
+  console.log('========================================');
+  console.log(`✅ Backend server running on port ${PORT}`);
+  console.log(`📧 Admin email configured: ${process.env.ADMIN_EMAIL}`);
+  console.log(`🔑 Resend API Key: ${process.env.RESEND_API_KEY ? 'Configured ✓' : 'NOT SET ❌'}`);
+  console.log(`🗄️  Supabase URL: ${process.env.SUPABASE_URL ? 'Configured ✓' : 'NOT SET ❌'}`);
+  console.log('========================================\n');
 });

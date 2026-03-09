@@ -14,14 +14,17 @@ interface ContactFormData {
 // POST /api/contact - Handle contact form submissions
 router.post('/contact', async (req: Request, res: Response) => {
   try {
+    console.log('📝 Contact form received:', { name: req.body.name, email: req.body.email });
     const { name, email, phone, message }: ContactFormData = req.body;
 
     // Validate required fields
     if (!name || !email || !phone || !message) {
+      console.log('❌ Validation failed: missing required fields');
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     // Save to Supabase
+    console.log('💾 Saving to Supabase enquiries table...');
     const { data, error } = await supabase
       .from('enquiries')
       .insert([
@@ -37,16 +40,23 @@ router.post('/contact', async (req: Request, res: Response) => {
       .select();
 
     if (error) {
-      console.error('Database error:', error);
-      return res.status(500).json({ error: 'Failed to save message' });
+      console.error('❌ Database error:', error);
+      return res.status(500).json({ error: 'Failed to save message to database' });
     }
+
+    console.log('✅ Saved to Supabase:', data);
 
     // Send emails
     try {
+      console.log('📧 Sending admin email to:', process.env.ADMIN_EMAIL);
       await sendAdminEmail({ name, email, phone, message });
+      console.log('✅ Admin email sent');
+
+      console.log('📧 Sending confirmation email to:', email);
       await sendConfirmationEmail({ name, email, phone, message });
+      console.log('✅ Confirmation email sent');
     } catch (emailError) {
-      console.error('Email sending error:', emailError);
+      console.error('❌ Email sending error:', emailError);
       // Still return success since the message was saved
     }
 
@@ -56,7 +66,7 @@ router.post('/contact', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Contact form error:', error);
+    console.error('❌ Contact form error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -64,14 +74,17 @@ router.post('/contact', async (req: Request, res: Response) => {
 // POST /api/admission - Handle admission form submissions
 router.post('/admission', async (req: Request, res: Response) => {
   try {
+    console.log('📝 Admission form received:', { name: req.body.name, email: req.body.email });
     const { name, email, phone, message }: ContactFormData = req.body;
 
     // Validate required fields
     if (!name || !email || !phone || !message) {
+      console.log('❌ Validation failed: missing required fields');
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     // Save to Supabase (same table or custom one)
+    console.log('💾 Saving to Supabase enquiries table...');
     const { data, error } = await supabase
       .from('enquiries')
       .insert([
@@ -87,16 +100,23 @@ router.post('/admission', async (req: Request, res: Response) => {
       .select();
 
     if (error) {
-      console.error('Database error:', error);
-      return res.status(500).json({ error: 'Failed to save message' });
+      console.error('❌ Database error:', error);
+      return res.status(500).json({ error: 'Failed to save message to database' });
     }
+
+    console.log('✅ Saved to Supabase:', data);
 
     // Send emails
     try {
+      console.log('📧 Sending admin email to:', process.env.ADMIN_EMAIL);
       await sendAdminEmail({ name, email, phone, message: `ADMISSION INQUIRY: ${message}` });
+      console.log('✅ Admin email sent');
+
+      console.log('📧 Sending confirmation email to:', email);
       await sendConfirmationEmail({ name, email, phone, message });
+      console.log('✅ Confirmation email sent');
     } catch (emailError) {
-      console.error('Email sending error:', emailError);
+      console.error('❌ Email sending error:', emailError);
     }
 
     return res.status(201).json({
@@ -105,7 +125,7 @@ router.post('/admission', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Admission form error:', error);
+    console.error('❌ Admission form error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -15,6 +15,10 @@ interface EmailData {
 
 export async function sendAdminEmail(data: EmailData) {
   try {
+    console.log('🔧 Preparing admin email for:', data.email);
+    console.log('📧 Admin email destination:', adminEmail);
+    console.log('🔑 Resend API Key configured:', !!process.env.RESEND_API_KEY);
+
     const response = await resend.emails.send({
       from: 'Choice Icon Schools <noreply@choiceiconschools.com>',
       to: adminEmail,
@@ -29,15 +33,19 @@ export async function sendAdminEmail(data: EmailData) {
         <p>${escapeHtml(data.message).replace(/\n/g, '<br>')}</p>
       `,
     });
+
+    console.log('✅ Admin email sent successfully. Response:', response);
     return response;
   } catch (error) {
-    console.error('Error sending admin email:', error);
+    console.error('❌ Error sending admin email:', error);
     throw error;
   }
 }
 
 export async function sendConfirmationEmail(data: EmailData) {
   try {
+    console.log('🔧 Preparing confirmation email for:', data.email);
+
     const response = await resend.emails.send({
       from: 'Choice Icon Schools <noreply@choiceiconschools.com>',
       to: data.email,
@@ -82,9 +90,11 @@ export async function sendConfirmationEmail(data: EmailData) {
         </html>
       `,
     });
+
+    console.log('✅ Confirmation email sent successfully. Response:', response);
     return response;
   } catch (error) {
-    console.error('Error sending confirmation email:', error);
+    console.error('❌ Error sending confirmation email:', error);
     throw error;
   }
 }
