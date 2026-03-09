@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
-import { CheckCircle, Search, Download } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Search, Download } from 'lucide-react';
+import SuccessModal from '../components/SuccessModal';
 
 export default function Admissions() {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
   const { register: registerFeedback, handleSubmit: handleSubmitFeedback, reset: resetFeedback } = useForm();
-  
+
   const [trackingId, setTrackingId] = useState('');
   const [trackingStatus, setTrackingStatus] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successEmail, setSuccessEmail] = useState('');
+  const [successType, setSuccessType] = useState<'Admission' | 'Contact'>('Admission');
+
   const source = watch('source');
 
   const onSubmit = async (data: any) => {
@@ -35,7 +37,9 @@ export default function Admissions() {
         throw new Error('Failed to submit enquiry');
       }
 
-      setIsSubmitted(true);
+      setSuccessEmail(data.email);
+      setSuccessType('Admission');
+      setShowSuccessModal(true);
       reset();
     } catch (error) {
       console.error('Error submitting enquiry:', error);
@@ -62,7 +66,9 @@ export default function Admissions() {
         throw new Error('Failed to submit feedback');
       }
 
-      alert('Feedback submitted successfully!');
+      setSuccessEmail(data.email);
+      setSuccessType('Contact');
+      setShowSuccessModal(true);
       resetFeedback();
     } catch (error) {
       console.error('Error submitting feedback:', error);
@@ -124,17 +130,8 @@ export default function Admissions() {
             <div className="lg:col-span-2">
               <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
                 <h2 className="text-xl font-bold text-navy-blue mb-6">Visitors Enquiry Form</h2>
-                
-                {isSubmitted ? (
-                  <div className="bg-green-50 text-green-800 p-6 rounded-xl flex flex-col items-center text-center">
-                    <CheckCircle size={48} className="mb-4 text-green-500" />
-                    <h3 className="text-xl font-bold mb-2">Enquiry Submitted!</h3>
-                    <p>Thank you for your interest. Our admissions team will contact you shortly.</p>
-                    <p className="mt-4 text-sm font-mono bg-white px-3 py-1 rounded border border-green-200">Your Tracking ID: 12345</p>
-                    <button onClick={() => setIsSubmitted(false)} className="mt-6 text-green-600 font-semibold hover:underline">Submit another enquiry</button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -231,7 +228,6 @@ export default function Admissions() {
                       Submit Enquiry
                     </button>
                   </form>
-                )}
               </div>
             </div>
 
@@ -348,6 +344,19 @@ export default function Admissions() {
           </div>
         </div>
       </section>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        title={successType === 'Admission' ? 'Enquiry Submitted Successfully!' : 'Feedback Sent Successfully!'}
+        message={
+          successType === 'Admission'
+            ? 'Thank you for your interest in joining our school. We have received your enquiry and will contact you soon to discuss the next steps.'
+            : 'Thank you for your feedback. Your message has been received and our team will review it shortly.'
+        }
+        email={successEmail}
+        formType={successType}
+        onClose={() => setShowSuccessModal(false)}
+      />
     </>
   );
 }

@@ -33,65 +33,81 @@ export async function sendAdminEmail(data: EmailData) {
         <html>
           <head>
             <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
               body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; }
-              .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+              .wrapper { background-color: #f5f5f5; padding: 20px; }
+              .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+              .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 30px 20px; text-align: center; }
               .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
               .header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
-              .badge { display: inline-block; background-color: ${typeColor}; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 10px; text-transform: uppercase; }
+              .badge { display: inline-block; background-color: ${typeColor}; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
               .content { padding: 30px 20px; }
               .form-section { margin-bottom: 25px; }
               .form-section h3 { color: #1e40af; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0; border-bottom: 2px solid ${typeColor}; padding-bottom: 8px; }
               .field { margin-bottom: 15px; }
               .field-label { font-weight: 600; color: #1e40af; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
               .field-value { background-color: #f9fafb; padding: 12px 15px; border-left: 4px solid ${typeColor}; border-radius: 4px; word-wrap: break-word; }
-              .footer { background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; font-size: 12px; color: #666; }
+              .field-value a { color: #1e40af; text-decoration: none; }
+              .field-value a:hover { text-decoration: underline; }
+              .divider { border-top: 1px solid #e5e7eb; margin: 25px 0; }
+              .footer { background-color: #f3f4f6; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 12px; color: #666; }
               .footer p { margin: 5px 0; }
               .button { display: inline-block; background-color: #1e40af; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; margin-top: 10px; }
+              .note { font-size: 12px; color: #666; font-style: italic; text-align: center; padding: 15px; background-color: #f0f9ff; border-left: 3px solid #1e40af; margin-top: 20px; }
+              table { width: 100%; border-collapse: collapse; }
+              td { padding: 8px 0; }
+              td:first-child { color: #1e40af; font-weight: 600; width: 35%; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; vertical-align: top; }
             </style>
           </head>
           <body>
-            <div class="container">
-              <div class="header">
-                <h1>Choice Icon Schools</h1>
-                <p>New Message Notification</p>
-                <div class="badge">${typeLabel} Form</div>
-              </div>
-
-              <div class="content">
-                <div class="form-section">
-                  <h3>Sender Information</h3>
-                  <div class="field">
-                    <span class="field-label">Full Name</span>
-                    <div class="field-value">${escapeHtml(data.name)}</div>
-                  </div>
-                  <div class="field">
-                    <span class="field-label">Email Address</span>
-                    <div class="field-value"><a href="mailto:${escapeHtml(data.email)}" style="color: #1e40af; text-decoration: none;">${escapeHtml(data.email)}</a></div>
-                  </div>
-                  <div class="field">
-                    <span class="field-label">Phone Number</span>
-                    <div class="field-value"><a href="tel:${escapeHtml(data.phone)}" style="color: #1e40af; text-decoration: none;">${escapeHtml(data.phone)}</a></div>
-                  </div>
+            <div class="wrapper">
+              <div class="container">
+                <div class="header">
+                  <h1>Choice Icon Schools</h1>
+                  <p>New Message Notification</p>
+                  <div class="badge">${typeLabel} Form</div>
                 </div>
 
-                <div class="form-section">
-                  <h3>Message</h3>
-                  <div class="field">
+                <div class="content">
+                  <div class="form-section">
+                    <h3>📋 Sender Information</h3>
+                    <table>
+                      <tr>
+                        <td>Name:</td>
+                        <td>${escapeHtml(data.name)}</td>
+                      </tr>
+                      <tr>
+                        <td>Email:</td>
+                        <td><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td>
+                      </tr>
+                      <tr>
+                        <td>Phone:</td>
+                        <td><a href="tel:${escapeHtml(data.phone)}">${escapeHtml(data.phone)}</a></td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="form-section">
+                    <h3>💬 Message</h3>
                     <div class="field-value">${escapeHtml(data.message).replace(/\n/g, '<br>')}</div>
                   </div>
+
+                  <div class="note">
+                    💡 Click "Reply" in your email client to respond directly to this sender
+                  </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 20px;">
-                  <a href="mailto:${escapeHtml(data.email)}" class="button">Reply to Sender</a>
+                <div class="footer">
+                  <p><strong>Choice Icon Schools</strong></p>
+                  <p>Ogwashi-Uku, Delta State | Nigeria</p>
+                  <p>© 2024 Choice Icon Schools. All rights reserved.</p>
+                  <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 11px;">
+                    This is an automated message from the school website. Please do not reply with sensitive information.
+                  </p>
                 </div>
-              </div>
-
-              <div class="footer">
-                <p><strong>Choice Icon Schools</strong></p>
-                <p>Ogwashi-Uku, Delta State | Nigeria</p>
-                <p>© 2024 Choice Icon Schools. All rights reserved.</p>
               </div>
             </div>
           </body>

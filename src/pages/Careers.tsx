@@ -1,61 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
-import { supabase } from '../lib/supabase';
+import SuccessModal from '../components/SuccessModal';
 
 export default function Careers() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successEmail, setSuccessEmail] = useState('');
 
   const onSubmit = async (data: any) => {
+    setIsSubmitting(true);
     try {
-      let cvUrl = '';
-      
-      // Upload CV if exists
-      if (data.cv[0]) {
-        const file = data.cv[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `cvs/${fileName}`;
+      const applicationDetails = `
+Gender: ${data.gender}
+Marital Status: ${data.maritalStatus}
+Date of Birth: ${data.dob}
+Qualification: ${data.qualification}
+Address: ${data.address}
+      `.trim();
 
-        const { error: uploadError } = await supabase.storage
-          .from('documents')
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('documents')
-          .getPublicUrl(filePath);
-          
-        cvUrl = publicUrl;
-      }
-
-      const coverLetter = `
-        Gender: ${data.gender}
-        Marital Status: ${data.maritalStatus}
-        DOB: ${data.dob}
-        Qualification: ${data.qualification}
-        Address: ${data.address}
-      `;
-
-      const { error } = await supabase
-        .from('job_applications')
-        .insert([{
-          full_name: `${data.surname} ${data.firstName}`,
+      const response = await fetch('http://localhost:5000/api/career', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${data.surname} ${data.firstName}`,
           email: data.email,
           phone: data.phone,
-          position: 'General Application',
-          cover_letter: coverLetter,
-          cv_url: cvUrl
-        }]);
+          message: applicationDetails,
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to submit application');
+      }
 
-      alert('Application submitted successfully!');
+      setSuccessEmail(data.email);
+      setShowSuccess(true);
       reset();
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -135,35 +124,22 @@ export default function Careers() {
                 <textarea {...register('address', { required: true })} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none"></textarea>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">CV Upload (PDF)</label>
-                <input 
-                  {...register('cv', { 
-                    required: 'CV is required',
-                    validate: {
-                      fileSize: (value) => {
-                        return !value[0] || value[0].size <= 500 * 1024 || 'File size must be less than 500KB';
-                      },
-                      fileType: (value) => {
-                        return !value[0] || value[0].type === 'application/pdf' || 'Only PDF files are allowed';
-                      }
-                    }
-                  })} 
-                  type="file" 
-                  accept=".pdf" 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none" 
-                />
-                <p className="text-xs text-gray-500 mt-1">Max file size: 500KB. Format: PDF only.</p>
-                {errors.cv && <span className="text-red-500 text-xs">{errors.cv.message as string}</span>}
-              </div>
-
-              <button type="submit" className="w-full bg-sky-blue hover:bg-deep-blue text-white font-bold py-3 rounded-lg transition-colors shadow-lg">
-                Submit Application
+              <button type="submit" disabled={isSubmitting} className="w-full bg-sky-blue hover:bg-deep-blue text-white font-bold py-3 rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </button>
             </form>
           </div>
         </div>
       </section>
+
+      <SuccessModal
+        isOpen={showSuccess}
+        title="Application Submitted Successfully!"
+        message="Thank you for your interest in joining our team at Choice Icon Schools. We have received your application and will review it carefully. If your qualifications match our requirements, we will contact you shortly."
+        email={successEmail}
+        formType="Career"
+        onClose={() => setShowSuccess(false)}
+      />
     </>
   );
 }
