@@ -49,11 +49,11 @@ router.post('/contact', async (req: Request, res: Response) => {
     // Send emails
     try {
       console.log('📧 Sending admin email to:', process.env.ADMIN_EMAIL);
-      await sendAdminEmail({ name, email, phone, message });
+      await sendAdminEmail({ name, email, phone, message, type: 'Contact' });
       console.log('✅ Admin email sent');
 
       console.log('📧 Sending confirmation email to:', email);
-      await sendConfirmationEmail({ name, email, phone, message });
+      await sendConfirmationEmail({ name, email, phone, message, type: 'Contact' });
       console.log('✅ Confirmation email sent');
     } catch (emailError) {
       console.error('❌ Email sending error:', emailError);
@@ -109,11 +109,11 @@ router.post('/admission', async (req: Request, res: Response) => {
     // Send emails
     try {
       console.log('📧 Sending admin email to:', process.env.ADMIN_EMAIL);
-      await sendAdminEmail({ name, email, phone, message: `ADMISSION INQUIRY: ${message}` });
+      await sendAdminEmail({ name, email, phone, message: `ADMISSION INQUIRY: ${message}`, type: 'Admission' });
       console.log('✅ Admin email sent');
 
       console.log('📧 Sending confirmation email to:', email);
-      await sendConfirmationEmail({ name, email, phone, message });
+      await sendConfirmationEmail({ name, email, phone, message, type: 'Admission' });
       console.log('✅ Confirmation email sent');
     } catch (emailError) {
       console.error('❌ Email sending error:', emailError);

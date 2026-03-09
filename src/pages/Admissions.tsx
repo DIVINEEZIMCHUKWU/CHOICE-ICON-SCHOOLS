@@ -25,7 +25,7 @@ export default function Admissions() {
         },
         body: JSON.stringify({
           name: data.fullName,
-          email: data.email || 'noemail@provided.com',
+          email: data.email,
           phone: data.phone,
           message: message,
         }),
@@ -52,7 +52,7 @@ export default function Admissions() {
         },
         body: JSON.stringify({
           name: data.name,
-          email: data.email || 'noemail@provided.com',
+          email: data.email,
           phone: data.phone || '',
           message: data.message,
         }),
@@ -138,7 +138,7 @@ export default function Admissions() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input 
+                        <input
                           {...register('fullName', { required: true })}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent outline-none transition-all"
                           placeholder="Terry Mike"
@@ -146,14 +146,25 @@ export default function Admissions() {
                         {errors.fullName && <span className="text-red-500 text-xs">This field is required</span>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                        <input 
-                          {...register('phone', { required: true })}
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input
+                          {...register('email', { required: true })}
+                          type="email"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent outline-none transition-all"
-                          placeholder="+234..."
+                          placeholder="your.email@example.com"
                         />
-                        {errors.phone && <span className="text-red-500 text-xs">This field is required</span>}
+                        {errors.email && <span className="text-red-500 text-xs">This field is required</span>}
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                      <input
+                        {...register('phone', { required: true })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent outline-none transition-all"
+                        placeholder="+234..."
+                      />
+                      {errors.phone && <span className="text-red-500 text-xs">This field is required</span>}
                     </div>
 
                     <div>
