@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { useForm } from 'react-hook-form';
 
-import { CheckCircle, Search, Download } from 'lucide-react';
+import { CheckCircle, Download, ChevronDown } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
 
@@ -18,11 +18,9 @@ export default function Admissions() {
 
   
 
-  const [trackingId, setTrackingId] = useState('');
-
-  const [trackingStatus, setTrackingStatus] = useState<string | null>(null);
-
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const [showProspectusMenu, setShowProspectusMenu] = useState(false);
 
   
 
@@ -140,71 +138,15 @@ export default function Admissions() {
 
   };
 
-
-
-  const handleTrack = async (e: React.FormEvent) => {
-
-    e.preventDefault();
-
-    // In a real app, we would query the database for the tracking ID.
-
-    // For now, we'll just simulate it or check if we store tracking IDs.
-
-    // Since the current schema doesn't strictly have a "tracking_id" column visible in the snippet,
-
-    // we might skip this or implement a simple lookup if we added a column.
-
-    // For this update, I'll keep the mock logic or query by phone/name if possible, 
-
-    // but the user asked for "tracking ID". 
-
-    // Let's assume for now we just show a message that this feature is coming soon or keep the mock.
-
-    // Keeping the mock logic for now as per previous implementation, or maybe query by ID if the user enters the row ID.
-
-    
-
-    if (trackingId) {
-
-       // Simple check if it's a number (Row ID)
-
-       const id = parseInt(trackingId);
-
-       if (!isNaN(id)) {
-
-         const { data, error } = await supabase
-
-           .from('admissions')
-
-           .select('status')
-
-           .eq('id', id)
-
-           .single();
-
-         
-
-         if (data) {
-
-            setTrackingStatus(data.status);
-
-         } else {
-
-            setTrackingStatus('Not Found');
-
-         }
-
-       } else {
-
-         setTrackingStatus('Invalid ID');
-
-       }
-
-    }
-
+  const handleDownloadProspectus = (prospectusFile: string) => {
+    const link = document.createElement('a');
+    link.href = `/Images/${prospectusFile}`;
+    link.download = prospectusFile;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowProspectusMenu(false);
   };
-
-
 
   return (
 
@@ -474,69 +416,73 @@ export default function Admissions() {
 
             <div className="space-y-8">
 
-              {/* Tracking */}
-
-              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
-
-                <h3 className="text-lg font-bold text-navy-blue mb-4 flex items-center gap-2">
-
-                  <Search size={20} /> Track Application
-
-                </h3>
-
-                <form onSubmit={handleTrack} className="space-y-4">
-
-                  <input 
-
-                    type="text" 
-
-                    value={trackingId}
-
-                    onChange={(e) => setTrackingId(e.target.value)}
-
-                    placeholder="Enter Tracking ID"
-
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none"
-
-                  />
-
-                  <button type="submit" className="w-full bg-navy-blue text-white py-2 rounded-lg font-medium hover:bg-deep-blue transition-colors">
-
-                    Check Status
-
-                  </button>
-
-                </form>
-
-                {trackingStatus && (
-
-                  <div className="mt-4 p-3 bg-white rounded border border-gray-200 text-center">
-
-                    <span className="text-sm text-gray-500">Status:</span>
-
-                    <p className="font-bold text-sky-blue">{trackingStatus}</p>
-
-                  </div>
-
-                )}
-
-              </div>
-
-
-
               {/* Prospectus */}
 
-              <div className="bg-deep-blue text-white p-6 rounded-2xl shadow-lg">
+              <div className="bg-deep-blue text-white p-6 rounded-2xl shadow-lg relative">
 
                 <h3 className="text-lg font-bold mb-2">School Prospectus</h3>
 
                 <p className="text-sm text-gray-300 mb-4">Download our detailed prospectus to learn more about our curriculum and facilities.</p>
 
-                <button className="w-full bg-white text-navy-blue py-3 rounded-lg font-bold hover:bg-sky-blue hover:text-white transition-colors flex items-center justify-center gap-2">
+                <div className="relative">
 
-                  <Download size={18} /> Download PDF
+                  <button 
 
-                </button>
+                    onClick={() => setShowProspectusMenu(!showProspectusMenu)}
+
+                    className="w-full bg-white text-navy-blue py-3 rounded-lg font-bold hover:bg-sky-blue hover:text-white transition-colors flex items-center justify-center gap-2"
+
+                  >
+
+                    <Download size={18} /> Select Prospectus <ChevronDown size={16} />
+
+                  </button>
+
+                  {showProspectusMenu && (
+
+                    <div className="absolute top-full mt-2 w-full bg-white text-navy-blue rounded-lg shadow-lg overflow-hidden z-10">
+
+                      <button
+
+                        onClick={() => handleDownloadProspectus('EARLY YEARS & NURSERY SCHOOL PROSPECTUS.pdf')}
+
+                        className="w-full px-4 py-3 text-left hover:bg-sky-blue hover:text-white transition-colors flex items-center gap-2 border-b border-gray-200"
+
+                      >
+
+                        <Download size={16} /> Early Years & Nursery
+
+                      </button>
+
+                      <button
+
+                        onClick={() => handleDownloadProspectus('PRIMARY SCHOOL PROSPECTUS.pdf')}
+
+                        className="w-full px-4 py-3 text-left hover:bg-sky-blue hover:text-white transition-colors flex items-center gap-2 border-b border-gray-200"
+
+                      >
+
+                        <Download size={16} /> Primary School
+
+                      </button>
+
+                      <button
+
+                        onClick={() => handleDownloadProspectus('SECONDARY SCHOOL PROSPECTUS.pdf')}
+
+                        className="w-full px-4 py-3 text-left hover:bg-sky-blue hover:text-white transition-colors flex items-center gap-2"
+
+                      >
+
+                        <Download size={16} /> Secondary School
+
+                      </button>
+
+                    </div>
+
+                  )}
+
+                </div>
 
               </div>
 
