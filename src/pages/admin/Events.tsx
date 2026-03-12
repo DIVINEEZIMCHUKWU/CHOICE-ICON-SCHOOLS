@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Calendar, MapPin, Clock } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { Plus, Trash2, Edit2, Calendar, MapPin, Clock, Upload } from 'lucide-react';
 
 interface Event {
   id: number;
@@ -25,13 +24,24 @@ export default function Events() {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('event_date', { ascending: true });
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
-      setEvents(data || []);
+      const response = await fetch('/api/events', { headers });
+      console.log('🔍 AdminEvents: Response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔍 AdminEvents: Raw data:', data);
+        // Handle both response formats
+        const eventsArray = Array.isArray(data) ? data : data.data || [];
+        console.log('🔍 AdminEvents: Processed events:', eventsArray);
+        setEvents(eventsArray);
+      } else {
+        console.error('Failed to fetch events');
+      }
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
@@ -43,27 +53,71 @@ export default function Events() {
     e.preventDefault();
 
     try {
-      if (editingEvent) {
-        const { error } = await supabase
-          .from('events')
-          .update(formData)
-          .eq('id', editingEvent.id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('events')
-          .insert([formData]);
-
-        if (error) throw error;
+      console.log('🔍 AdminEvents: Submitting event form...');
+      console.log('🔍 AdminEvents: Form data:', formData);
+      
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
+      // Create FormData for file upload
+      const submitFormData = new FormData();
+      submitFormData.append('title', formData.title);
+      submitFormData.append('description', formData.description);
+      submitFormData.append('event_date', formData.event_date);
+      submitFormData.append('location', formData.location);
+
+      // Handle file upload
+      const fileInput = document.getElementById('event-image') as HTMLInputElement;
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        console.log('🔍 AdminEvents: File selected:', fileInput.files[0].name);
+        submitFormData.append('file', fileInput.files[0]);
+      } else {
+        console.log('🔍 AdminEvents: No file selected');
+      }
+
+      let response;
+      if (editingEvent) {
+        console.log('🔍 AdminEvents: Updating event...');
+        // For updates, include the current image_url if no new file
+        if (!fileInput?.files?.[0]) {
+          submitFormData.append('image_url', formData.image_url);
+        }
+        response = await fetch(`/api/events/${editingEvent.id}`, {
+          method: 'PUT',
+          headers,
+          body: submitFormData
+        });
+      } else {
+        console.log('🔍 AdminEvents: Creating new event...');
+        response = await fetch('/api/events', {
+          method: 'POST',
+          headers,
+          body: submitFormData
+        });
+      }
+
+      console.log('🔍 AdminEvents: Response status:', response.status);
+      console.log('🔍 AdminEvents: Response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('🔍 AdminEvents: Error response:', errorData);
+        throw new Error(errorData.error || 'Failed to save event');
+      }
+
+      const responseData = await response.json();
+      console.log('🔍 AdminEvents: Success response:', responseData);
+
+      fetchEvents();
       setIsModalOpen(false);
       setEditingEvent(null);
       setFormData({ title: '', description: '', event_date: '', location: '', image_url: '' });
-      fetchEvents();
     } catch (error) {
-      console.error('Error saving event:', error);
+      console.error('🔍 AdminEvents: Error saving event:', error);
+      alert('Failed to save event: ' + (error as Error).message);
     }
   };
 
@@ -71,15 +125,25 @@ export default function Events() {
     if (!confirm('Are you sure you want to delete this event?')) return;
 
     try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id);
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
+      const response = await fetch(`/api/events/${id}`, {
+        method: 'DELETE',
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete event');
+      }
+
       fetchEvents();
     } catch (error) {
       console.error('Error deleting event:', error);
+      alert('Failed to delete event');
     }
   };
 
@@ -208,13 +272,23 @@ export default function Events() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (Optional)</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event Image</label>
+                <div className="space-y-2">
+                  <input
+                    id="event-image"
+                    type="file"
+                    accept="image/*"
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-sky-blue file:text-white hover:file:bg-deep-blue cursor-pointer"
+                  />
+                  <p className="text-xs text-gray-400">Or enter image URL below:</p>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none"
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Globe, Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Save, Globe, Phone, Mail, MapPin, Facebook } from 'lucide-react';
 
 export default function ContentManager() {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -24,13 +24,21 @@ export default function ContentManager() {
 
   const updateSetting = async (key: string, value: string) => {
     try {
-      await fetch('/api/settings', {
+      console.log('🔧 ContentManager: Updating setting:', { key, value });
+      const response = await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, value }),
       });
+      console.log('🔧 ContentManager: Response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔧 ContentManager: Response data:', data);
+      } else {
+        console.error('🔧 ContentManager: Failed to update setting');
+      }
     } catch (error) {
-      console.error(`Error updating setting ${key}:`, error);
+      console.error(`🔧 ContentManager: Error updating setting ${key}:`, error);
     }
   };
 
@@ -38,11 +46,21 @@ export default function ContentManager() {
     e.preventDefault();
     setSaving(true);
     try {
+      console.log('🔧 ContentManager: Starting save all process...');
+      console.log('🔧 ContentManager: Current settings to save:', settings);
+      
       for (const [key, value] of Object.entries(settings)) {
+        console.log('🔧 ContentManager: Saving setting:', key, value);
         await updateSetting(key, value as string);
+        // Add small delay to avoid overwhelming the server
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
+      
+      console.log('🔧 ContentManager: All settings saved, refreshing...');
+      await fetchSettings(); // Refresh settings from server
       alert('All settings saved successfully!');
     } catch (error) {
+      console.error('🔧 ContentManager: Error in save all:', error);
       alert('Error saving settings');
     } finally {
       setSaving(false);
@@ -126,17 +144,6 @@ export default function ContentManager() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none text-sm"
                 value={settings.facebook || 'https://www.facebook.com/thechoiceiconschools'}
                 onChange={(e) => handleChange('facebook', e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
-                <Instagram size={12} /> Instagram URL
-              </label>
-              <input
-                type="url"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue outline-none text-sm"
-                value={settings.instagram || ''}
-                onChange={(e) => handleChange('instagram', e.target.value)}
               />
             </div>
           </div>

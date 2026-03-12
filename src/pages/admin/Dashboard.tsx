@@ -16,18 +16,18 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/stats');
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch('/api/stats', { headers });
         if (response.ok) {
           const data = await response.json();
-          setStats({
-            admissions: data.admissions,
-            enquiries: data.enquiries,
-            jobs: data.jobApplications,
-            posts: data.blogPosts,
-            events: data.upcomingEvents,
-            announcements: data.activeAnnouncements,
-            media: data.mediaLinks
-          });
+          setStats(data.data);
+        } else {
+          console.error('Failed to fetch stats');
         }
       } catch (error) {
         console.error('Error fetching stats:', error);

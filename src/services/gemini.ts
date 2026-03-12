@@ -62,12 +62,12 @@ We are looking for passionate team members on a mission to steer young ones away
 let ai: GoogleGenAI | null = null;
 
 export async function getChatResponse(userMessage: string): Promise<string> {
-  if (!process.env.GEMINI_API_KEY) {
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
     return "I'm sorry, I cannot answer right now. Please contact the school directly.";
   }
 
   if (!ai) {
-    ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
   }
 
   try {

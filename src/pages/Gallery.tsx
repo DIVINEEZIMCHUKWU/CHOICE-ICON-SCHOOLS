@@ -5,7 +5,6 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { supabase } from '../lib/supabase';
 
 interface GalleryImage {
   id: number;
@@ -39,32 +38,30 @@ export default function Gallery() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: imagesData, error: imagesError } = await supabase
-          .from('gallery_images')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (imagesError) throw imagesError;
-        setImages(imagesData && imagesData.length > 0 ? imagesData : fallbackImages);
-
-        const { data: videosData, error: videosError } = await supabase
-          .from('gallery_videos')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (videosError) throw videosError;
-        setVideos(videosData || []);
+        const response = await fetch('/api/gallery');
+        if (response.ok) {
+          const data = await response.json();
+          const imagesData = data.data.filter((item: any) => item.type === 'image');
+          const videosData = data.data.filter((item: any) => item.type === 'video');
+          setImages(imagesData && imagesData.length > 0 ? imagesData : fallbackImages);
+          setVideos(videosData || []);
+        } else {
+          setImages(fallbackImages);
+          setVideos([]);
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching gallery data:', error);
         setImages(fallbackImages);
+        setVideos([]);
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  // All images from Images folder for Photo Gallery (excluding specified ones)
+  // All images from Images folder for Photo Gallery
   const allGalleryImages = [
     { id: 201, title: 'School View 0', category: 'Gallery', image_url: '/Images/0.jpg' },
     { id: 202, title: 'School View 1', category: 'Gallery', image_url: '/Images/1.jpg' },
@@ -94,7 +91,7 @@ export default function Gallery() {
     { id: 226, title: 'Science Lab 2', category: 'Gallery', image_url: '/Images/Science 2.jpg' }
   ];
 
-  const displayImages = images.length > 0 ? images : fallbackImages;
+  const displayImages = fallbackImages; // Only use static images for Virtual Tour
 
   const getYoutubeEmbedUrl = (url: string) => {
     let videoId = '';
@@ -199,23 +196,33 @@ export default function Gallery() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-navy-blue mb-12 text-center">Photo Gallery</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allGalleryImages.map((item, idx) => (
-              <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg aspect-video cursor-pointer">
-                <img 
-                  src={item.image_url} 
-                  alt={item.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                />
-                <div className="absolute inset-0 bg-navy-blue/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button 
-                    onClick={() => setSelectedImage(item.image_url)}
-                    className="text-white font-bold text-lg border border-white px-6 py-2 rounded-full hover:bg-white hover:text-navy-blue transition-colors"
-                  >
-                    VIEW
-                  </button>
+            {/* Combine static images with uploaded gallery images */}
+            {[...allGalleryImages, ...images].map((item, idx) => {
+              // Clean up title - remove "School View X" text for static images
+              const cleanTitle = item.title.includes('School View') ? '' : item.title;
+              
+              return (
+                <div key={`${item.id}-${idx}`} className="group relative overflow-hidden rounded-xl shadow-lg aspect-video cursor-pointer">
+                  <img 
+                    src={item.image_url} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                  />
+                  <div className="absolute inset-0 bg-navy-blue/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <button 
+                      onClick={() => setSelectedImage(item.image_url)}
+                      className="text-white font-bold text-lg border border-white px-6 py-2 rounded-full hover:bg-white hover:text-navy-blue transition-colors"
+                    >
+                      VIEW
+                    </button>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                    <p className="text-white text-sm font-bold truncate">{cleanTitle || 'School Photo'}</p>
+                    <p className="text-gray-300 text-xs">{item.category}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

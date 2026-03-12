@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Menu, X, Phone, Mail, MapPin, Facebook } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import ChatBot from './ChatBot';
 import FloatingWhatsApp from './FloatingWhatsApp';
+import AnnouncementsBar from './AnnouncementsBar';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -43,21 +44,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     email: settings.email || 'thechoiceiconschools@gmail.com',
     address: settings.address || 'ICON Avenue, off Delta State Polytechnic Road, Behind Joanchim Filling Station, Ogwashi-Uku, Delta State',
     facebook: settings.facebook || 'https://www.facebook.com/thechoiceiconschools',
-    instagram: settings.instagram || '#',
     announcementBar: settings.announcement_bar || 'Admissions Now Open for Early Years, Nursery, Primary and Secondary'
   };
 
   return (
     <div className="min-h-screen flex flex-col font-sans text-gray-800">
-      {/* Announcement Bar */}
-      <div className="bg-sky-blue text-white py-2 px-4 text-center text-sm font-medium">
-        <div className="max-w-7xl mx-auto flex justify-between items-center flex-col sm:flex-row gap-2">
-          <span>{contactInfo.announcementBar}</span>
-          <Link to="/admissions" className="bg-white text-sky-blue px-4 py-1 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors uppercase tracking-wider">
-            Apply Now
-          </Link>
-        </div>
-      </div>
+      {/* Dynamic Announcements Bar */}
+      <AnnouncementsBar />
 
       {/* Top Bar */}
       <div className="bg-white border-b border-gray-100 py-2 hidden md:block">
@@ -68,7 +61,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-3">
             <a href={contactInfo.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-navy-blue transition-colors"><Facebook size={14} /></a>
-            <a href={contactInfo.instagram} className="hover:text-navy-blue transition-colors"><Instagram size={14} /></a>
           </div>
         </div>
       </div>
@@ -187,7 +179,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </p>
               <div className="flex gap-4">
                 <a href={contactInfo.facebook} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-sky-blue transition-colors"><Facebook size={16} /></a>
-                <a href={contactInfo.instagram} className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-sky-blue transition-colors"><Instagram size={16} /></a>
               </div>
             </div>
 

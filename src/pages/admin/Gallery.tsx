@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Trash2, Upload, Image as ImageIcon, Video, Plus, Youtube } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { supabase } from '../../lib/supabase';
 
 interface GalleryImage {
   id: number;
@@ -36,21 +35,22 @@ export default function AdminGallery() {
 
   const fetchData = async () => {
     try {
-      const { data: imagesData, error: imagesError } = await supabase
-        .from('gallery_images')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (imagesError) throw imagesError;
-      setImages(imagesData || []);
-
-      const { data: videosData, error: videosError } = await supabase
-        .from('gallery_videos')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (videosError) throw videosError;
-      setVideos(videosData || []);
+      const response = await fetch('/api/gallery', { headers });
+      if (response.ok) {
+        const data = await response.json();
+        const images = data.data.filter((item: any) => item.type === 'image');
+        const videos = data.data.filter((item: any) => item.type === 'video');
+        setImages(images);
+        setVideos(videos);
+      } else {
+        console.error('Failed to fetch gallery data');
+      }
     } catch (error) {
       console.error('Error fetching gallery data:', error);
     } finally {
@@ -64,36 +64,34 @@ export default function AdminGallery() {
 
     try {
       setUploading(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('gallery-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('gallery-images')
-        .getPublicUrl(filePath);
-
-      const { error } = await supabase
-        .from('gallery_images')
-        .insert([{
-          title: data.title,
-          category: data.category,
-          image_url: publicUrl
-        }]);
-
-      if (error) throw error;
       
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', data.title || 'Gallery Image');
+      formData.append('category', data.category || 'General');
+      
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch('/api/gallery/image', {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload image');
+      }
+
       fetchData();
       resetImage();
-      alert('Image uploaded successfully!');
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Failed to upload image.');
+      alert('Failed to upload image');
     } finally {
       setUploading(false);
     }
@@ -101,15 +99,28 @@ export default function AdminGallery() {
 
   const onVideoSubmit = async (data: any) => {
     try {
-      const { error } = await supabase
-        .from('gallery_videos')
-        .insert([{
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch('/api/gallery/video', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
           title: data.title,
           url: data.url,
           type: data.url.includes('drive.google.com') ? 'googledrive' : 'youtube'
-        }]);
+        })
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add video');
+      }
 
       fetchData();
       resetVideo();
@@ -123,15 +134,25 @@ export default function AdminGallery() {
   const handleDeleteImage = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this image?')) {
       try {
-        const { error } = await supabase
-          .from('gallery_images')
-          .delete()
-          .eq('id', id);
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
 
-        if (error) throw error;
-        setImages(images.filter(img => img.id !== id));
+        const response = await fetch(`/api/gallery/image/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete image');
+        }
+
+        fetchData();
       } catch (error) {
         console.error('Error deleting image:', error);
+        alert('Failed to delete image');
       }
     }
   };
@@ -139,15 +160,25 @@ export default function AdminGallery() {
   const handleDeleteVideo = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this video?')) {
       try {
-        const { error } = await supabase
-          .from('gallery_videos')
-          .delete()
-          .eq('id', id);
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
 
-        if (error) throw error;
-        setVideos(videos.filter(vid => vid.id !== id));
+        const response = await fetch(`/api/gallery/video/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete video');
+        }
+
+        fetchData();
       } catch (error) {
         console.error('Error deleting video:', error);
+        alert('Failed to delete video');
       }
     }
   };

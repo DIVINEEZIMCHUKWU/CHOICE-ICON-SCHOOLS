@@ -48,9 +48,11 @@ export default function Sidebar() {
     <div className="bg-navy-blue text-white w-64 min-h-screen flex flex-col shadow-2xl z-40">
       <div className="p-6 border-b border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-navy-blue font-bold text-lg">
-            IC
-          </div>
+          <img 
+            src="/Images/Choice Logo.jpg" 
+            alt="Choice Icon Schools" 
+            className="w-10 h-10 rounded-lg"
+          />
           <div>
             <h1 className="text-base font-bold tracking-tight">Admin Panel</h1>
             <p className="text-[10px] text-sky-blue/70 uppercase tracking-widest font-medium">The Choice ICON</p>

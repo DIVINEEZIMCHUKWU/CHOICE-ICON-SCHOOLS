@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Trash2, Edit, Plus, Image as ImageIcon, X, Save, Upload } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
 
 interface BlogPost {
   id: number;
@@ -31,13 +30,19 @@ export default function AdminBlog() {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
-      setPosts(data || []);
+      const response = await fetch('/api/blog', { headers });
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data.data);
+      } else {
+        console.error('Failed to fetch blog posts');
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -48,15 +53,25 @@ export default function AdminBlog() {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        const { error } = await supabase
-          .from('blog_posts')
-          .delete()
-          .eq('id', id);
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
 
-        if (error) throw error;
-        setPosts(posts.filter(p => p.id !== id));
+        const response = await fetch(`/api/blog/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete post');
+        }
+
+        fetchPosts();
       } catch (error) {
         console.error('Error deleting post:', error);
+        alert('Failed to delete post. Please try again.');
       }
     }
   };
@@ -82,21 +97,29 @@ export default function AdminBlog() {
   };
 
   const uploadImage = async (file: File, bucket: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('bucket', bucket);
+    
+    const token = localStorage.getItem('token');
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
-    const { error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file);
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers,
+      body: formData
+    });
 
-    if (uploadError) throw uploadError;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to upload image');
+    }
 
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
+    const data = await response.json();
+    return data.url;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,42 +170,51 @@ export default function AdminBlog() {
     e.preventDefault();
     
     try {
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       if (isEditing && currentPost.id) {
-        const { error } = await supabase
-          .from('blog_posts')
-          .update({
+        const response = await fetch(`/api/blog/${currentPost.id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
             title: currentPost.title,
             category: currentPost.category,
-            date: currentPost.date,
             excerpt: currentPost.excerpt,
             content: currentPost.content,
             image_url: currentPost.image_url,
             additional_images: currentPost.additional_images
           })
-          .eq('id', currentPost.id);
+        });
 
-        if (error) throw error;
-        
-        // Refresh posts to get updated data
-        fetchPosts();
+        if (!response.ok) {
+          throw new Error('Failed to update post');
+        }
       } else {
-        const { error } = await supabase
-          .from('blog_posts')
-          .insert([{
+        const response = await fetch('/api/blog', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
             title: currentPost.title,
             category: currentPost.category,
-            date: currentPost.date,
             excerpt: currentPost.excerpt,
             content: currentPost.content,
             image_url: currentPost.image_url,
             additional_images: currentPost.additional_images
-          }]);
+          })
+        });
 
-        if (error) throw error;
-        
-        fetchPosts();
+        if (!response.ok) {
+          throw new Error('Failed to create post');
+        }
       }
       
+      fetchPosts();
       setShowForm(false);
       setCurrentPost({});
     } catch (error) {
@@ -258,8 +290,11 @@ export default function AdminBlog() {
                     <option value="">Select Category</option>
                     <option value="Announcements">Announcements</option>
                     <option value="Education">Education</option>
+                    <option value="Parenting / School Life">Parenting / School Life</option>
                     <option value="Events">Events</option>
-                    <option value="Student Achievements">Student Achievements</option>
+                    <option value="News">News</option>
+                    <option value="Student Stories">Student Stories</option>
+                    <option value="General">General</option>
                   </select>
                 </div>
               </div>

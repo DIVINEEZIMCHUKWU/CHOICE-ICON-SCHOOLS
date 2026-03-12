@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 const SCHOOL_EMAILS = [
-  'divinetonyezimchukwu@gmail.com' // Testing recipient only
+  'divinetonyezimchukwu@gmail.com' // Testing recipient only - backend handles official emails
 ];
 const FROM_EMAIL = 'notifications@choiceiconschools.com';
 

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Bell } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
 
 interface Announcement {
   id: number;
   title: string;
   content: string;
-  is_active: number;
+  is_active: boolean | number; // Handle both boolean and number
   created_at: string;
 }
 
@@ -23,13 +22,24 @@ export default function Announcements() {
 
   const fetchAnnouncements = async () => {
     try {
-      const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
-      setAnnouncements(data || []);
+      const response = await fetch('/api/announcements', { headers });
+      console.log('🔍 AdminAnnouncements: Response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔍 AdminAnnouncements: Raw data:', data);
+        // Handle both response formats
+        const announcementsArray = Array.isArray(data) ? data : data.data || [];
+        console.log('🔍 AdminAnnouncements: Processed announcements:', announcementsArray);
+        setAnnouncements(announcementsArray);
+      } else {
+        console.error('Failed to fetch announcements');
+      }
     } catch (error) {
       console.error('Error fetching announcements:', error);
     } finally {
@@ -41,35 +51,57 @@ export default function Announcements() {
     e.preventDefault();
 
     try {
-      if (editingAnnouncement) {
-        const { error } = await supabase
-          .from('announcements')
-          .update({
-            title: formData.title,
-            content: formData.content,
-            is_active: formData.is_active === 1
-          })
-          .eq('id', editingAnnouncement.id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('announcements')
-          .insert([{
-            title: formData.title,
-            content: formData.content,
-            is_active: formData.is_active === 1
-          }]);
-
-        if (error) throw error;
+      console.log('🔍 AdminAnnouncements: Submitting form...');
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
+      if (editingAnnouncement) {
+        console.log('🔍 AdminAnnouncements: Updating announcement...');
+        const response = await fetch(`/api/announcements/${editingAnnouncement.id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            title: formData.title,
+            content: formData.content,
+            is_active: formData.is_active
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update announcement');
+        }
+        console.log('🔍 AdminAnnouncements: Update successful');
+      } else {
+        console.log('🔍 AdminAnnouncements: Creating new announcement...');
+        const response = await fetch('/api/announcements', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            title: formData.title,
+            content: formData.content,
+            is_active: formData.is_active
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create announcement');
+        }
+        console.log('🔍 AdminAnnouncements: Create successful');
+      }
+      
+      console.log('🔍 AdminAnnouncements: Refreshing announcements list...');
+      fetchAnnouncements();
       setIsModalOpen(false);
       setEditingAnnouncement(null);
       setFormData({ title: '', content: '', is_active: 1 });
-      fetchAnnouncements();
     } catch (error) {
       console.error('Error saving announcement:', error);
+      alert('Failed to save announcement');
     }
   };
 
@@ -77,15 +109,25 @@ export default function Announcements() {
     if (!confirm('Are you sure you want to delete this announcement?')) return;
 
     try {
-      const { error } = await supabase
-        .from('announcements')
-        .delete()
-        .eq('id', id);
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
+      const response = await fetch(`/api/announcements/${id}`, {
+        method: 'DELETE',
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete announcement');
+      }
+
       fetchAnnouncements();
     } catch (error) {
       console.error('Error deleting announcement:', error);
+      alert('Failed to delete announcement');
     }
   };
 

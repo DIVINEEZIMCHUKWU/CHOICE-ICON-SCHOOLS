@@ -19,13 +19,19 @@ export async function sendAdminEmail(data: EmailData) {
   try {
     console.log('🔧 Preparing admin email for:', data.email);
     console.log('📧 Admin email destination:', adminEmail);
-    console.log('🔑 Resend API Key configured:', !!process.env.RESEND_API_KEY);
+    console.log('�🔑 Resend API Key configured:', !!process.env.RESEND_API_KEY);
+    console.log('📝 Email content preview:', {
+      name: data.name,
+      phone: data.phone,
+      message: data.message.substring(0, 100) + '...',
+      type: data.type
+    });
 
     const typeLabel = data.type || 'Contact';
     const typeColor = data.type === 'Admission' ? '#EF4444' : data.type === 'Career' ? '#F59E0B' : '#EC4899';
 
     const response = await resend.emails.send({
-      from: 'Choice Icon Schools <noreply@choiceiconschools.com>',
+      from: 'Choice Icon Schools <info@choiceiconschools.com>',
       to: adminEmail,
       replyTo: data.email,
       subject: `New ${typeLabel} Form Submission - Choice Icon Schools`,
@@ -36,29 +42,33 @@ export async function sendAdminEmail(data: EmailData) {
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
-              .wrapper { background-color: #f5f5f5; padding: 20px; }
-              .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-              .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 30px 20px; text-align: center; }
-              .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
-              .header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
-              .badge { display: inline-block; background-color: ${typeColor}; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-              .content { padding: 30px 20px; }
-              .form-section { margin-bottom: 25px; }
-              .form-section h3 { color: #1e40af; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0; border-bottom: 2px solid ${typeColor}; padding-bottom: 8px; }
-              .field { margin-bottom: 15px; }
-              .field-label { font-weight: 600; color: #1e40af; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
-              .field-value { background-color: #f9fafb; padding: 12px 15px; border-left: 4px solid ${typeColor}; border-radius: 4px; word-wrap: break-word; }
-              .field-value a { color: #1e40af; text-decoration: none; }
-              .field-value a:hover { text-decoration: underline; }
-              .divider { border-top: 1px solid #e5e7eb; margin: 25px 0; }
-              .footer { background-color: #f3f4f6; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 12px; color: #666; }
-              .footer p { margin: 5px 0; }
-              .button { display: inline-block; background-color: #1e40af; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; margin-top: 10px; }
-              .note { font-size: 12px; color: #666; font-style: italic; text-align: center; padding: 15px; background-color: #f0f9ff; border-left: 3px solid #1e40af; margin-top: 20px; }
-              table { width: 100%; border-collapse: collapse; }
-              td { padding: 8px 0; }
-              td:first-child { color: #1e40af; font-weight: 600; width: 35%; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; vertical-align: top; }
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; line-height: 1.6 !important; color: #333 !important; margin: 0 !important; padding: 0 !important; background-color: #f5f5f5 !important; }
+              .wrapper { background-color: #f5f5f5 !important; padding: 20px !important; }
+              .container { max-width: 600px !important; margin: 0 auto !important; background-color: #ffffff !important; border-radius: 8px !important; overflow: hidden !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; }
+              .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important; color: white !important; padding: 30px 20px !important; text-align: center !important; }
+              .header h1 { margin: 0 !important; font-size: 28px !important; font-weight: 600 !important; }
+              .header p { margin: 5px 0 0 0 !important; font-size: 14px !important; opacity: 0.9 !important; }
+              .badge { display: inline-block !important; background-color: ${typeColor} !important; color: white !important; padding: 6px 16px !important; border-radius: 20px !important; font-size: 12px !important; font-weight: 600 !important; margin-top: 10px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; }
+              .content { padding: 30px 20px !important; }
+              .form-section { margin-bottom: 25px !important; }
+              .form-section h3 { color: #1e40af !important; font-size: 14px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; margin: 0 0 10px 0 !important; border-bottom: 2px solid ${typeColor} !important; padding-bottom: 8px !important; }
+              .field { margin-bottom: 15px !important; }
+              .field-label { font-weight: 600 !important; color: #1e40af !important; font-size: 12px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; margin-bottom: 5px !important; display: block !important; }
+              .field-value { background-color: #f9fafb !important; padding: 12px 15px !important; border-left: 4px solid ${typeColor} !important; border-radius: 4px !important; word-wrap: break-word !important; word-break: break-word !important; overflow-wrap: break-word !important; }
+              .field-value a { color: #1e40af !important; text-decoration: none !important; word-break: break-word !important; }
+              .field-value a:hover { text-decoration: underline !important; }
+              .divider { border-top: 1px solid #e5e7eb !important; margin: 25px 0 !important; }
+              .footer { background-color: #f3f4f6 !important; padding: 20px !important; text-align: center !important; border-top: 1px solid #e5e7eb !important; font-size: 12px !important; color: #666 !important; }
+              .footer p { margin: 5px 0 !important; }
+              .button { display: inline-block !important; background-color: #1e40af !important; color: white !important; padding: 10px 20px !important; border-radius: 4px !important; text-decoration: none !important; font-weight: 600 !important; margin-top: 10px !important; }
+              .note { font-size: 12px !important; color: #666 !important; font-style: italic !important; text-align: center !important; padding: 15px !important; background-color: #f0f9ff !important; border-left: 3px solid #1e40af !important; margin-top: 20px !important; }
+              table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
+              td { padding: 8px 0 !important; word-break: break-word !important; overflow-wrap: break-word !important; }
+              td:first-child { color: #1e40af !important; font-weight: 600 !important; width: 35% !important; text-transform: uppercase !important; font-size: 11px !important; letter-spacing: 0.5px !important; vertical-align: top !important; }
+              td:last-child { width: 65% !important; word-break: break-word !important; }
+              a { word-break: break-word !important; }
+              .reply-section { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 20px !important; }
+              .reply-section h4 { color: #1e40af !important; margin: 0 0 10px 0 !important; font-size: 16px !important; }
             </style>
           </head>
           <body>
@@ -147,7 +157,7 @@ export async function sendConfirmationEmail(data: EmailData) {
     const typeLabel = data.type || 'Contact';
 
     const response = await resend.emails.send({
-      from: 'Choice Icon Schools <noreply@choiceiconschools.com>',
+      from: 'Choice Icon Schools <info@choiceiconschools.com>',
       to: data.email,
       subject: `We received your ${typeLabel} message - Choice Icon Schools`,
       html: `
@@ -156,26 +166,28 @@ export async function sendConfirmationEmail(data: EmailData) {
           <head>
             <meta charset="utf-8">
             <style>
-              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; }
-              .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0; }
-              .header h1 { margin: 0; font-size: 32px; font-weight: 600; }
-              .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.95; }
-              .checkmark { font-size: 48px; margin: 15px 0; }
-              .content { padding: 40px 20px; }
-              .content-section { margin-bottom: 30px; }
-              .content-section h2 { color: #1e40af; font-size: 18px; font-weight: 600; margin: 0 0 15px 0; }
-              .content-section p { margin: 10px 0; line-height: 1.8; }
-              .info-box { background-color: #eff6ff; border-left: 4px solid #1e40af; padding: 15px; border-radius: 4px; margin: 15px 0; }
-              .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
-              .contact-info h3 { color: #1e40af; margin: 0 0 15px 0; font-size: 14px; font-weight: 600; text-transform: uppercase; }
-              .contact-item { margin: 12px 0; }
-              .contact-item strong { color: #1e40af; display: block; font-size: 12px; text-transform: uppercase; margin-bottom: 4px; }
-              .contact-item a { color: #1e40af; text-decoration: none; font-weight: 600; }
-              .contact-item a:hover { text-decoration: underline; }
-              .cta-button { display: inline-block; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 20px 0; }
-              .footer { background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; font-size: 12px; color: #666; }
-              .footer p { margin: 5px 0; }
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; line-height: 1.6 !important; color: #333 !important; margin: 0 !important; padding: 0 !important; background-color: #f5f5f5 !important; }
+              .container { max-width: 600px !important; margin: 0 auto !important; padding: 20px !important; background-color: #ffffff !important; }
+              .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important; color: white !important; padding: 40px 20px !important; text-align: center !important; border-radius: 8px 8px 0 0 !important; }
+              .header h1 { margin: 0 !important; font-size: 32px !important; font-weight: 600 !important; }
+              .header p { margin: 10px 0 0 0 !important; font-size: 16px !important; opacity: 0.95 !important; }
+              .checkmark { font-size: 48px !important; margin: 15px 0 !important; }
+              .content { padding: 40px 20px !important; }
+              .content-section { margin-bottom: 30px !important; }
+              .content-section h2 { color: #1e40af !important; font-size: 18px !important; font-weight: 600 !important; margin: 0 0 15px 0 !important; }
+              .content-section p { margin: 10px 0 !important; line-height: 1.8 !important; }
+              .info-box { background-color: #eff6ff !important; border-left: 4px solid #1e40af !important; padding: 15px !important; border-radius: 4px !important; margin: 15px 0 !important; }
+              .contact-info { background-color: #f0f9ff !important; padding: 20px !important; border-radius: 8px !important; margin: 20px 0 !important; }
+              .contact-info h3 { color: #1e40af !important; margin: 0 0 15px 0 !important; font-size: 14px !important; font-weight: 600 !important; text-transform: uppercase !important; }
+              .contact-item { margin: 12px 0 !important; }
+              .contact-item strong { color: #1e40af !important; display: block !important; font-size: 12px !important; text-transform: uppercase !important; margin-bottom: 4px !important; }
+              .contact-item a { color: #1e40af !important; text-decoration: none !important; font-weight: 600 !important; }
+              .contact-item a:hover { text-decoration: underline !important; }
+              .cta-button { display: inline-block !important; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important; color: white !important; padding: 12px 30px !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 600 !important; margin: 20px 0 !important; }
+              .footer { background-color: #f3f4f6 !important; padding: 20px !important; text-align: center !important; border-radius: 0 0 8px 8px !important; font-size: 12px !important; color: #666 !important; }
+              .footer p { margin: 5px 0 !important; }
+              .reply-section { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 20px !important; }
+              .reply-section h4 { color: #1e40af !important; margin: 0 0 10px 0 !important; font-size: 16px !important; }
             </style>
           </head>
           <body>

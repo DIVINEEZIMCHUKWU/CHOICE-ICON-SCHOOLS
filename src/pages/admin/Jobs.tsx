@@ -71,6 +71,16 @@ export default function AdminJobs() {
     }
   };
 
+  const handleCVDownload = (cvUrl: string, applicantName: string) => {
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = cvUrl;
+    link.download = `${applicantName.replace(/\s+/g, '_')}_CV.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredApplications = applications.filter(app =>
     app.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.position.toLowerCase().includes(searchTerm.toLowerCase())
@@ -131,8 +141,8 @@ export default function AdminJobs() {
                         {app.position}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-700">{app.email}</div>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-700 break-all max-w-xs" title={app.email}>{app.email}</div>
                       <div className="text-[10px] text-gray-400 font-medium">{app.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -141,18 +151,16 @@ export default function AdminJobs() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         {app.cv_url && (
-                          <a 
-                            href={app.cv_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() => handleCVDownload(app.cv_url, app.full_name)}
                             className="text-sky-blue hover:text-deep-blue p-2 hover:bg-sky-50 rounded-lg transition-colors inline-flex items-center gap-1"
                             title="Download CV"
                           >
                             <Download size={18} />
-                          </a>
+                          </button>
                         )}
-                        <button 
-                          onClick={() => handleDelete(app.id)} 
+                        <button
+                          onClick={() => handleDelete(app.id)}
                           className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
                           title="Delete"
                         >

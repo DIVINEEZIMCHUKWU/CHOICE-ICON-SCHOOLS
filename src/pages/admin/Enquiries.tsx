@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Trash2, Mail, CheckCircle } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
 
 interface Enquiry {
   id: number;
@@ -20,33 +19,23 @@ export default function AdminEnquiries() {
 
   useEffect(() => {
     fetchEnquiries();
-
-    // Subscribe to realtime changes
-    const subscription = supabase
-      .channel('enquiries_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'enquiries' }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setEnquiries((prev) => [payload.new as Enquiry, ...prev]);
-        } else if (payload.eventType === 'DELETE') {
-          setEnquiries((prev) => prev.filter((enquiry) => enquiry.id !== payload.old.id));
-        }
-      })
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []);
 
   const fetchEnquiries = async () => {
     try {
-      const { data, error } = await supabase
-        .from('enquiries')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
-      setEnquiries(data || []);
+      const response = await fetch('/api/enquiries', { headers });
+      if (response.ok) {
+        const data = await response.json();
+        setEnquiries(data.data);
+      } else {
+        console.error('Failed to fetch enquiries');
+      }
     } catch (error) {
       console.error('Error fetching enquiries:', error);
     } finally {
@@ -57,15 +46,25 @@ export default function AdminEnquiries() {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this enquiry?')) {
       try {
-        const { error } = await supabase
-          .from('enquiries')
-          .delete()
-          .eq('id', id);
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
 
-        if (error) throw error;
-        // State update handled by realtime subscription
+        const response = await fetch(`/api/enquiries/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete enquiry');
+        }
+
+        fetchEnquiries();
       } catch (error) {
         console.error('Error deleting enquiry:', error);
+        alert('Failed to delete enquiry. Please try again.');
       }
     }
   };
@@ -130,8 +129,8 @@ export default function AdminEnquiries() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-bold text-navy-blue">{enquiry.name}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-700">{enquiry.email}</div>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-700 break-all max-w-xs" title={enquiry.email}>{enquiry.email}</div>
                       <div className="text-[10px] text-gray-400 font-medium">{enquiry.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

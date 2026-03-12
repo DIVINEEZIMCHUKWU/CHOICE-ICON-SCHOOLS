@@ -6,9 +6,13 @@ import { Helmet } from 'react-helmet-async';
 export default function AdminLogin() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = async (data: any) => {
+    setIsLoading(true);
+    setError('');
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -18,16 +22,18 @@ export default function AdminLogin() {
         body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', responseData.token);
         navigate('/admin/dashboard');
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Login failed');
+        setError(responseData.message || 'Login failed. Please check your credentials.');
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+    } catch (err: any) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -39,20 +45,22 @@ export default function AdminLogin() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md border border-gray-100">
           <div className="text-center mb-10">
-            <div className="w-16 h-16 bg-navy-blue rounded-2xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg shadow-navy-blue/20">
-              IC
-            </div>
+            <img 
+              src="/Images/Choice Logo.jpg" 
+              alt="Choice Icon Schools" 
+              className="w-20 h-20 mx-auto mb-4 rounded-xl shadow-lg"
+            />
             <h2 className="text-2xl font-bold text-navy-blue">Admin Login</h2>
             <p className="text-gray-400 text-sm mt-1 uppercase tracking-widest font-medium">The Choice ICON Schools</p>
           </div>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-6 text-sm flex items-center gap-3">
               <span className="w-1.5 h-1.5 bg-red-600 rounded-full shrink-0"></span>
               {error}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
@@ -76,12 +84,13 @@ export default function AdminLogin() {
             </div>
             <button
               type="submit"
-              className="w-full bg-navy-blue hover:bg-deep-blue text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-navy-blue/20 active:scale-[0.98]"
+              disabled={isLoading}
+              className="w-full bg-navy-blue hover:bg-deep-blue disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-navy-blue/20 active:scale-[0.98]"
             >
-              Sign In
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-          
+
           <div className="mt-10 text-center">
             <p className="text-xs text-gray-400">
               &copy; {new Date().getFullYear()} The Choice ICON Schools

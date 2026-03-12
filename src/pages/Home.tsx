@@ -7,10 +7,68 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { ArrowRight, BookOpen, Users, Award, Monitor, Heart, Bus, Shield, Globe, Phone } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, Award, Monitor, Heart, Bus, Shield, Globe, Phone, Calendar, MapPin, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+interface Event {
+  id: number;
+  title: string;
+  description: string;
+  event_date: string;
+  location: string;
+  image_url: string;
+  created_at: string;
+}
+
 export default function Home() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        console.log('🔍 Homepage: Fetching events...');
+        const response = await fetch('/api/events');
+        console.log('🔍 Homepage: Events response status:', response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('🔍 Homepage: Raw events data:', data);
+          // Handle both response formats
+          const eventsArray = Array.isArray(data) ? data : data.data || [];
+          console.log('🔍 Homepage: Processed events array:', eventsArray);
+          // Filter for upcoming events (today or future)
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const upcomingEvents = eventsArray.filter((event: Event) => {
+            const eventDate = new Date(event.event_date);
+            eventDate.setHours(0, 0, 0, 0);
+            console.log('🔍 Homepage: Event date check:', { 
+              eventTitle: event.title, 
+              eventDate: event.event_date, 
+              today: today.toISOString(), 
+              isUpcoming: eventDate >= today 
+            });
+            return eventDate >= today;
+          });
+          console.log('🔍 Homepage: Upcoming events:', upcomingEvents);
+          // Sort by date (closest first) and limit to 3
+          const sortedEvents = upcomingEvents
+            .sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
+            .slice(0, 3);
+          console.log('🔍 Homepage: Final sorted events:', sortedEvents);
+          setEvents(sortedEvents);
+        } else {
+          console.error('🔍 Homepage: Failed to fetch events');
+        }
+      } catch (error) {
+        console.error('🔍 Homepage: Error fetching events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
   const heroSlides = [
     {
       image: '/Images/13.jpg',
@@ -311,6 +369,95 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Upcoming Events */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-navy-blue mb-4">Upcoming Events</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Stay updated with our latest school activities and important dates</p>
+          </div>
+          
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-sky-blue"></div>
+              <p className="text-gray-500 mt-4">Loading events...</p>
+            </div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">No Upcoming Events</h3>
+              <p className="text-gray-500 mb-6">Check back soon for our latest school activities</p>
+              <Link to="/events" className="inline-flex items-center gap-2 bg-sky-blue text-white px-6 py-3 rounded-full hover:bg-deep-blue transition-colors">
+                View All Events
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {events.map((event, index) => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                >
+                  {event.image_url && (
+                    <div className="h-48 overflow-hidden">
+                      <img 
+                        src={event.image_url} 
+                        alt={event.title} 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 text-sky-blue mb-3">
+                      <Calendar size={16} />
+                      <span className="text-sm font-medium">
+                        {new Date(event.event_date).toLocaleDateString('en-US', { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-navy-blue mb-2">{event.title}</h3>
+                    {event.location && (
+                      <div className="flex items-center gap-2 text-gray-600 mb-3">
+                        <MapPin size={14} />
+                        <span className="text-sm">{event.location}</span>
+                      </div>
+                    )}
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
+                    <Link 
+                      to="/events" 
+                      className="inline-flex items-center gap-2 text-sky-blue hover:text-deep-blue font-medium text-sm transition-colors"
+                    >
+                      Learn More
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+          
+          {events.length > 0 && (
+            <div className="text-center mt-12">
+              <Link 
+                to="/events" 
+                className="inline-flex items-center gap-2 bg-sky-blue text-white px-8 py-4 rounded-full hover:bg-deep-blue transition-colors shadow-lg shadow-sky-blue/20"
+              >
+                View All Events
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Search, Trash2, Download, Eye } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { Users, FileText, CheckCircle, Download, Search, Trash2 } from 'lucide-react';
 
 interface Admission {
   id: number;
@@ -19,37 +18,32 @@ export default function AdminAdmissions() {
 
   useEffect(() => {
     fetchAdmissions();
-
-    // Subscribe to realtime changes
-    const subscription = supabase
-      .channel('admissions_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'admissions' }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setAdmissions((prev) => [payload.new as Admission, ...prev]);
-        } else if (payload.eventType === 'DELETE') {
-          setAdmissions((prev) => prev.filter((admission) => admission.id !== payload.old.id));
-        } else if (payload.eventType === 'UPDATE') {
-          setAdmissions((prev) => prev.map((admission) => (admission.id === payload.new.id ? (payload.new as Admission) : admission)));
-        }
-      })
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []);
 
   const fetchAdmissions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('admissions')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log('🎓 Fetching admissions data...');
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
-      setAdmissions(data || []);
+      const response = await fetch('/api/admissions', { headers });
+      console.log('🎓 Admissions response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🎓 Admissions data received:', data);
+        setAdmissions(data.data || []);
+      } else {
+        const errorData = await response.json();
+        console.error('🎓 Admissions fetch error:', errorData);
+        setAdmissions([]);
+      }
     } catch (error) {
-      console.error('Error fetching admissions:', error);
+      console.error('🎓 Error fetching admissions:', error);
+      setAdmissions([]);
     } finally {
       setIsLoading(false);
     }
@@ -58,30 +52,53 @@ export default function AdminAdmissions() {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this admission?')) {
       try {
-        const { error } = await supabase
-          .from('admissions')
-          .delete()
-          .eq('id', id);
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
 
-        if (error) throw error;
-        // State update handled by realtime subscription
+        const response = await fetch(`/api/admissions/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete admission');
+        }
+
+        fetchAdmissions();
       } catch (error) {
         console.error('Error deleting admission:', error);
+        alert('Failed to delete admission. Please try again.');
       }
     }
   };
 
   const handleStatusChange = async (id: number, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('admissions')
-        .update({ status: newStatus })
-        .eq('id', id);
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-      if (error) throw error;
-      // State update handled by realtime subscription
+      const response = await fetch(`/api/admissions/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update status');
+      }
+
+      fetchAdmissions();
     } catch (error) {
       console.error('Error updating status:', error);
+      alert('Failed to update status. Please try again.');
     }
   };
 
