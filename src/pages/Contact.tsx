@@ -222,9 +222,9 @@ export default function Contact() {
 
                   <div>
 
-                    <h3 className="font-bold text-base text-navy-blue mb-1">Office Hours</h3>
+                    <h3 className="font-bold text-base text-navy-blue mb-1">School Hours</h3>
 
-                    <p className="text-gray-600 text-sm">Monday - Friday: 8:00 AM - 4:00 PM</p>
+                    <p className="text-gray-600 text-sm">Monday - Friday: 7:00 AM - 3:00 PM</p>
 
                   </div>
 
