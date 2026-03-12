@@ -168,7 +168,7 @@ export default function Careers() {
 
 
 
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -185,6 +185,8 @@ export default function Careers() {
               Do you want to join a passionate team on a mission to steer our young ones away from moral and intellectual decadence?
 
             </h2>
+
+            <p className="text-gray-600 text-sm mb-4">We are in search of courageous individuals who embrace challenges head-on and defy conventional expectations. We seek leaders who have the vision to set ambitious targets for students and staff, and who are not scared to dream big and set lofty goals that will drive our school's growth and success.</p>
 
             <p className="text-gray-600 text-sm">Fill out the form below to apply.</p>
 

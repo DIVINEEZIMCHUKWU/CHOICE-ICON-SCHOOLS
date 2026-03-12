@@ -94,21 +94,21 @@ export default function AnnouncementsBar() {
   }
 
   return (
-    <div className="bg-sky-blue text-white py-2 px-4 text-center text-sm font-medium relative">
-      <div className="max-w-7xl mx-auto flex justify-between items-center flex-col sm:flex-row gap-2">
-        <div className="flex-1 flex items-center justify-center">
-          <span className="truncate">
+    <div className="bg-sky-blue text-white py-2 sm:py-3 px-3 sm:px-4 text-center text-xs sm:text-sm font-medium relative">
+      <div className="max-w-7xl mx-auto flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex-1 flex items-center justify-center min-w-0">
+          <span className="line-clamp-2 sm:truncate">
             📢 {currentAnnouncement.title}: {currentAnnouncement.content}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {allAnnouncements.length > 1 && (
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {allAnnouncements.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors ${
                     index === currentIndex ? 'bg-white' : 'bg-white/50'
                   }`}
                   aria-label={`Go to announcement ${index + 1}`}
@@ -118,10 +118,10 @@ export default function AnnouncementsBar() {
           )}
           <button
             onClick={() => setIsVisible(false)}
-            className="text-white/80 hover:text-white transition-colors"
+            className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
             aria-label="Close announcements"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
       </div>

@@ -127,7 +127,7 @@ export default function Gallery() {
             <p className="text-gray-400 text-sm">Experience our campus from anywhere.</p>
           </div>
           
-          <div className="h-[400px] rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
+          <div className="h-[250px] sm:h-[300px] md:h-[400px] rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
             <Swiper
               modules={[Navigation, Pagination, Autoplay]}
               navigation
@@ -192,7 +192,7 @@ export default function Gallery() {
       )}
 
       {/* Photo Gallery Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-navy-blue mb-12 text-center">Photo Gallery</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

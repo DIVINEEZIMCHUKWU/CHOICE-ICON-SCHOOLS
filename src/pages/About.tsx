@@ -20,9 +20,9 @@ export default function About() {
       </div>
 
       {/* Main Content */}
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
             <div>
               <h2 className="text-2xl font-bold text-navy-blue mb-6">Our Story</h2>
               <div className="space-y-4 text-gray-600 leading-relaxed text-sm md:text-base">
@@ -37,6 +37,9 @@ export default function About() {
                 </p>
                 <p className="italic border-l-4 border-sky-blue pl-4 my-6 text-gray-800">
                   The scripture admonishes us to train up a child in the way he should go, even when he is old he will not depart from it. (Proverb 22:6).
+                </p>
+                <p>
+                  The developmental years are an exciting time when children embark upon new adventures in the world of learning. Each year will provide important transitions and acquisition of new skills that will enhance each student's ability to apply learning in many ways. The Choice ICON Schools, are committed to integrating the arts into learning opportunities because we believe that we learn better with and through the arts.
                 </p>
               </div>
             </div>
@@ -53,7 +56,7 @@ export default function About() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20 bg-navy-blue text-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-navy-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Mission */}
@@ -76,7 +79,7 @@ export default function About() {
       </section>
 
       {/* Philosophy */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl font-bold text-navy-blue mb-4">Our Educational Philosophy</h2>

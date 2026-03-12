@@ -420,7 +420,7 @@ export default function AdminBlog() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
         {isLoading ? (
           <div className="col-span-full text-center py-12 text-gray-500">Loading posts...</div>
         ) : filteredPosts.length === 0 ? (

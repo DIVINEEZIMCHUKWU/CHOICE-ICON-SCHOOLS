@@ -58,7 +58,7 @@ export default function Events() {
         </div>
       </div>
 
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {events.length === 0 && !isLoading ? (
             <div className="text-center text-gray-500 py-12">
@@ -69,14 +69,14 @@ export default function Events() {
               {events.map((event, idx) => {
                 const { day, month, year } = formatDate(event.event_date);
                 return (
-                  <div key={idx} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow">
-                    <div className={`bg-sky-blue text-white p-6 md:w-48 flex flex-col justify-center items-center text-center shrink-0`}>
+                  <div key={idx} className="flex flex-col sm:flex-row bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow">
+                    <div className={`bg-sky-blue text-white p-4 sm:p-6 sm:w-48 flex flex-col justify-center items-center text-center shrink-0`}>
                       <Calendar size={32} className="mb-2 opacity-80" />
                       <span className="text-3xl font-bold">{day}</span>
                       <span className="text-sm uppercase tracking-wider font-medium">{month}</span>
                       <span className="text-xs opacity-75 mt-1">{year}</span>
                     </div>
-                    <div className="p-6 md:p-8 flex-1">
+                    <div className="p-4 sm:p-6 md:p-8 flex-1">
                       <h3 className="text-xl font-bold text-navy-blue mb-3">{event.title}</h3>
                       <div className="flex flex-wrap gap-4 text-xs md:text-sm text-gray-500 mb-4">
                         <div className="flex items-center gap-1">

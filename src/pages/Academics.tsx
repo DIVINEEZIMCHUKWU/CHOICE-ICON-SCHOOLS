@@ -44,9 +44,9 @@ export default function Academics() {
         </div>
       </div>
 
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-16 md:mb-20">
             <div>
               <h2 className="text-2xl font-bold text-navy-blue mb-6">Nigeria British Curriculum</h2>
               <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base">

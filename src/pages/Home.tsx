@@ -104,14 +104,15 @@ export default function Home() {
 
   const features = [
     { icon: <Award className="w-8 h-8 text-sky-blue" />, title: 'Qualitative Education' },
-    { icon: <Monitor className="w-8 h-8 text-sky-blue" />, title: 'Well Equipped Science Labs' },
-    { icon: <Heart className="w-8 h-8 text-sky-blue" />, title: 'Conducive Environment' },
-    { icon: <Users className="w-8 h-8 text-sky-blue" />, title: 'Highly Qualified Staff' },
-    { icon: <Monitor className="w-8 h-8 text-sky-blue" />, title: 'State of Art Computer Lab' },
-    { icon: <Bus className="w-8 h-8 text-sky-blue" />, title: 'Efficient Transport' },
-    { icon: <Shield className="w-8 h-8 text-sky-blue" />, title: 'Well-equipped Healing Bay' },
-    { icon: <Globe className="w-8 h-8 text-sky-blue" />, title: 'Global Teaching Resources' },
-    { icon: <Users className="w-8 h-8 text-sky-blue" />, title: 'Counselling & Moral Instruction' },
+    { icon: <Monitor className="w-8 h-8 text-sky-blue" />, title: 'Well Equipped Science Laboratories' },
+    { icon: <Heart className="w-8 h-8 text-sky-blue" />, title: 'Conducive and Serene Environment for learning' },
+    { icon: <Users className="w-8 h-8 text-sky-blue" />, title: 'Highly qualifies and motivated Staff' },
+    { icon: <Monitor className="w-8 h-8 text-sky-blue" />, title: 'State of the Art Computer Laboratory' },
+    { icon: <Bus className="w-8 h-8 text-sky-blue" />, title: 'Efficient and effective transport system' },
+    { icon: <Shield className="w-8 h-8 text-sky-blue" />, title: 'Well-equipped Healing Bay with Qualified Personnel' },
+    { icon: <Globe className="w-8 h-8 text-sky-blue" />, title: 'Excellent Teaching Resources from around the Globe' },
+    { icon: <Users className="w-8 h-8 text-sky-blue" />, title: 'Counselling and moral instruction' },
+    { icon: <Shield className="w-8 h-8 text-sky-blue" />, title: 'Discipline' },
   ];
 
   return (
@@ -122,7 +123,7 @@ export default function Home() {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] lg:h-[700px] bg-navy-blue">
+      <section className="relative h-screen max-h-[500px] sm:max-h-[600px] md:max-h-[700px] bg-navy-blue">
         <Swiper
           modules={[Autoplay, EffectFade, Navigation, Pagination]}
           effect="fade"
@@ -148,27 +149,27 @@ export default function Home() {
                     height: '100%'
                   }}
                 />
-                <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
-                  <div className="max-w-4xl">
-                    <h2 className="text-sky-blue font-bold tracking-widest uppercase mb-4 text-xs md:text-base animate-fade-in-up">
+                <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-3 sm:px-4">
+                  <div className="max-w-4xl w-full">
+                    <h2 className="text-sky-blue font-bold tracking-widest uppercase mb-3 sm:mb-4 text-[10px] sm:text-xs md:text-base animate-fade-in-up">
                       {slide.subtitle}
                     </h2>
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight animate-fade-in-up delay-200">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight animate-fade-in-up delay-200">
                       {slide.title}
                     </h1>
-                    <p className="text-gray-200 text-base md:text-lg mb-10 max-w-2xl mx-auto animate-fade-in-up delay-300">
+                    <p className="text-gray-200 text-xs sm:text-base md:text-lg mb-6 sm:mb-10 max-w-2xl mx-auto animate-fade-in-up delay-300">
                       {slide.text}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-500">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-fade-in-up delay-500">
                   <Link 
                     to="/admissions" 
-                    className="bg-sky-blue hover:bg-deep-blue text-white px-6 py-3 rounded-full font-bold text-base transition-all shadow-lg hover:shadow-sky-blue/30"
+                    className="bg-sky-blue hover:bg-deep-blue text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base transition-all shadow-lg hover:shadow-sky-blue/30"
                   >
                     Apply for Admission
                   </Link>
                   <Link 
                     to="/contact" 
-                    className="bg-transparent border-2 border-white hover:bg-white hover:text-navy-blue text-white px-6 py-3 rounded-full font-bold text-base transition-all"
+                    className="bg-transparent border-2 border-white hover:bg-white hover:text-navy-blue text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base transition-all"
                   >
                     Contact Us
                   </Link>
@@ -182,9 +183,9 @@ export default function Home() {
       </section>
 
       {/* Introduction Section */}
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
             <motion.div 
               initial={{ x: -50, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
@@ -196,7 +197,7 @@ export default function Home() {
                 <img 
                   src="/Images/24.jpg" 
                   alt="Students learning" 
-                  className="rounded-2xl shadow-2xl w-full object-cover h-[400px] scale-105"
+                  className="rounded-2xl shadow-2xl w-full object-cover h-[250px] sm:h-[350px] md:h-[400px] scale-105"
                 />
                 <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl max-w-xs hidden md:block">
                   <p className="text-navy-blue font-bold text-base mb-2">"Train up a child..."</p>
@@ -237,7 +238,7 @@ export default function Home() {
       </section>
 
       {/* Our Schools Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl font-bold text-navy-blue mb-4">Our Schools</h2>
@@ -270,7 +271,7 @@ export default function Home() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20 bg-navy-blue text-white relative overflow-hidden">
+      <section className="py-12 sm:py-16 md:py-20 bg-navy-blue text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 skew-x-12 transform origin-top-right"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -305,6 +306,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl font-bold text-navy-blue mb-4">Why Choose Us?</h2>
+            <h3 className="text-lg font-semibold text-sky-blue mb-4">OUR UNIQUE FEATURES</h3>
             <p className="text-gray-600 max-w-2xl mx-auto text-sm">We provide a comprehensive educational experience designed to groom the next generation of icons.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -52,12 +52,12 @@ export default function Team() {
         </div>
       </div>
 
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
             {team.map((member, idx) => (
               <div key={idx} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-shadow group">
-                <div className="h-80 overflow-hidden relative">
+                <div className="h-[250px] sm:h-[300px] md:h-80 overflow-hidden relative">
                   <img 
                     src={member.img} 
                     alt={member.name} 

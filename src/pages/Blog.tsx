@@ -58,7 +58,7 @@ export default function Blog() {
             </button>
 
             <article>
-              <div className="h-[400px] rounded-2xl overflow-hidden mb-8 shadow-lg">
+              <div className="h-[250px] sm:h-[300px] md:h-[400px] rounded-2xl overflow-hidden mb-8 shadow-lg">
                 <img src={selectedPost.image_url} alt={selectedPost.title} className="w-full h-full object-cover" />
               </div>
 
@@ -106,7 +106,7 @@ export default function Blog() {
         </div>
       </div>
 
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (

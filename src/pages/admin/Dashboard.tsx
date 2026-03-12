@@ -68,14 +68,14 @@ export default function Dashboard() {
         </a>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-10">
         <StatCard title="Admissions" value={stats.admissions} icon={<Users size={20} />} color="bg-sky-blue/10" textColor="text-sky-blue" />
         <StatCard title="Enquiries" value={stats.enquiries} icon={<MessageSquare size={20} />} color="bg-emerald-50" textColor="text-emerald-500" />
         <StatCard title="Job Apps" value={stats.jobs} icon={<FileText size={20} />} color="bg-purple-50" textColor="text-purple-500" />
         <StatCard title="Upcoming Events" value={stats.events} icon={<Calendar size={20} />} color="bg-orange-50" textColor="text-orange-500" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-navy-blue">Recent Enquiries</h3>

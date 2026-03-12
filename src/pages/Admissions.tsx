@@ -168,7 +168,9 @@ export default function Admissions() {
 
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Admissions Open</h1>
 
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">Join the Icon Family</p>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-4">Join the Icon Family</p>
+
+          <p className="text-base text-gray-300 max-w-2xl mx-auto">Admissions are open for Early Years, Nursery, Primary and Secondary Schools</p>
 
         </div>
 
@@ -176,11 +178,11 @@ export default function Admissions() {
 
 
 
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
 
             
 

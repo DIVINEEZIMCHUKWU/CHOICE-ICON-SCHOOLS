@@ -65,7 +65,7 @@ export default function Settings() {
         <p className="text-gray-600">Manage your account security and application preferences</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
         <div className="md:col-span-1">
           <h3 className="text-lg font-bold text-navy-blue mb-2">Security</h3>
           <p className="text-sm text-gray-500">
