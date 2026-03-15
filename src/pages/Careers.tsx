@@ -18,63 +18,39 @@ export default function Careers() {
 
     try {
 
-      let cvUrl = '';
+      let cvFileName = '';
+
+      let cvFile = '';
 
       
 
-      // Upload CV if exists
+      // If CV file is provided, convert to base64
 
       if (data.cv[0]) {
 
         const file = data.cv[0];
 
-        const fileExt = file.name.split('.').pop();
+        cvFileName = file.name;
 
-        const fileName = `${Math.random()}.${fileExt}`;
+        
 
-        const filePath = `cvs/${fileName}`;
+        // Convert file to base64
 
+        const reader = new FileReader();
 
+        const base64Promise = new Promise<string>((resolve, reject) => {
 
-        const { error: uploadError } = await supabase.storage
+          reader.onload = () => resolve(reader.result as string);
 
-          .from('documents')
+          reader.onerror = reject;
 
-          .upload(filePath, file);
+          reader.readAsDataURL(file);
 
+        });
 
-
-        if (uploadError) throw uploadError;
-
-
-
-        const { data: { publicUrl } } = supabase.storage
-
-          .from('documents')
-
-          .getPublicUrl(filePath);
-
-          
-
-        cvUrl = publicUrl;
+        cvFile = await base64Promise;
 
       }
-
-
-
-      const coverLetter = `
-
-        Gender: ${data.gender}
-
-        Marital Status: ${data.maritalStatus}
-
-        DOB: ${data.dob}
-
-        Qualification: ${data.qualification}
-
-        Address: ${data.address}
-
-      `;
 
 
 
@@ -106,9 +82,9 @@ export default function Careers() {
 
           address: data.address,
 
-          cvFileName: cvUrl ? data.cv[0].name : '',
+          cvFileName,
 
-          cvFile: cvUrl,
+          cvFile,
 
         }),
 
