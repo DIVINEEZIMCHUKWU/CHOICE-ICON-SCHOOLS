@@ -23,7 +23,7 @@ export default defineConfig(({mode}) => {
       port: 3000,
       proxy: {
         '/api': {
-          target: 'http://localhost:5000',
+          target: 'https://choice-icon-schools.vercel.app',
           changeOrigin: true,
           secure: false,
         },
