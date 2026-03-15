@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Helmet } from 'react-helmet-async';
+import { api } from '../../utils/api';
 
 export default function AdminLogin() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -14,17 +15,9 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const responseData = await api.login(data);
 
-      const responseData = await response.json();
-
-      if (response.ok) {
+      if (responseData.success) {
         localStorage.setItem('token', responseData.token);
         navigate('/admin/dashboard');
       } else {

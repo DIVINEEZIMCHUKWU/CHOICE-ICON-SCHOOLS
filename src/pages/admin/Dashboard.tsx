@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Users, FileText, MessageSquare, Calendar, Home } from 'lucide-react';
+import { api } from '../../utils/api';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -17,14 +18,10 @@ export default function Dashboard() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('token');
-        const headers: HeadersInit = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
+        if (!token) return;
 
-        const response = await fetch('/api/stats', { headers });
-        if (response.ok) {
-          const data = await response.json();
+        const data = await api.getStats(token);
+        if (data) {
           setStats(data.data);
         } else {
           console.error('Failed to fetch stats');

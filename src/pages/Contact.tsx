@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet-async';
 
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react';
 
+import { api } from '../utils/api';
+
 
 
 export default function Contact() {
@@ -54,29 +56,14 @@ export default function Contact() {
 
     try {
 
-      const response = await fetch('/api/contact', {
-
-        method: 'POST',
-
-        headers: {
-
-          'Content-Type': 'application/json',
-
-        },
-
-        body: JSON.stringify({
-
-          ...formData,
-
-          type: 'Contact'
-
-        }),
-
+      const responseData = await api.submitContact({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
       });
 
-
-
-      if (response.ok) {
+      if (responseData.success) {
 
         setIsSubmitted(true);
 

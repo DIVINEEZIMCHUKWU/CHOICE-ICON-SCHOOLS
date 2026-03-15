@@ -8,9 +8,7 @@ import { CheckCircle, Download, ChevronDown } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
 
-
-
-export default function Admissions() {
+import { api } from '../utils/api';
 
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
 
@@ -36,33 +34,21 @@ export default function Admissions() {
 
       
 
-      const response = await fetch('/api/admission', {
+      const responseData = await api.submitAdmission({
 
-        method: 'POST',
+        name: data.fullName,
 
-        headers: {
+        email: data.email || '',
 
-          'Content-Type': 'application/json',
+        phone: data.phone,
 
-        },
-
-        body: JSON.stringify({
-
-          name: data.fullName,
-
-          email: data.email || '',
-
-          phone: data.phone,
-
-          message: message,
-
-        }),
+        message: message,
 
       });
 
 
 
-      if (!response.ok) {
+      if (!responseData.success) {
 
         throw new Error('Failed to submit admission enquiry');
 
@@ -90,33 +76,21 @@ export default function Admissions() {
 
     try {
 
-      const response = await fetch('/api/feedback', {
+      const responseData = await api.submitFeedback({
 
-        method: 'POST',
+        name: data.name,
 
-        headers: {
+        phone: data.phone,
 
-          'Content-Type': 'application/json',
+        email: data.email || '',
 
-        },
-
-        body: JSON.stringify({
-
-          name: data.name,
-
-          phone: data.phone,
-
-          email: data.email || '',
-
-          message: data.message,
-
-        }),
+        message: data.message,
 
       });
 
 
 
-      if (!response.ok) {
+      if (!responseData.success) {
 
         throw new Error('Failed to submit feedback');
 
