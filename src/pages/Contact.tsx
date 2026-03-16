@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { Helmet } from 'react-helmet-async';
 
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Facebook } from 'lucide-react';
 
 import { api } from '../utils/api';
 
@@ -192,6 +192,37 @@ export default function Contact() {
                     <h3 className="font-bold text-base text-navy-blue mb-1">Email Us</h3>
 
                     <p className="text-gray-600 text-sm">thechoiceiconschools@gmail.com</p>
+
+                  </div>
+
+                </div>
+
+
+
+                {/* Social Media */}
+                <div className="flex items-start gap-4">
+
+                  <div className="bg-sky-blue/10 p-3 rounded-full text-sky-blue shrink-0">
+
+                    <Facebook size={20} />
+
+                  </div>
+
+                  <div>
+
+                    <h3 className="font-bold text-base text-navy-blue mb-1">Follow Us</h3>
+
+                    <div className="flex gap-3">
+                      <a 
+                        href="https://www.facebook.com/your-facebook-page" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        <Facebook size={20} />
+                      </a>
+                      <p className="text-gray-600 text-sm">Connect with us on Facebook</p>
+                    </div>
 
                   </div>
 

@@ -140,13 +140,14 @@ export default function Home() {
                 <img 
                   src={slide.image} 
                   alt={slide.title} 
-                  className="h-full w-full object-cover object-center"
+                  className="h-full w-full object-cover"
                   style={{ 
                     position: 'absolute',
-                    top: 0,
+                    top: '-15%',
                     left: 0,
                     width: '100%',
-                    height: '100%'
+                    height: '120%',
+                    objectPosition: 'top center'
                   }}
                 />
                 <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-3 sm:px-4">

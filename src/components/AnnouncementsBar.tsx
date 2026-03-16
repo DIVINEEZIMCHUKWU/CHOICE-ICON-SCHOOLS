@@ -87,21 +87,21 @@ export default function AnnouncementsBar() {
   }
 
   return (
-    <div className="bg-sky-blue text-white py-2 sm:py-3 px-3 sm:px-4 text-center text-xs sm:text-sm font-medium relative">
-      <div className="max-w-7xl mx-auto flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-3">
-        <div className="flex-1 flex items-center justify-center min-w-0">
-          <span className="line-clamp-2 sm:truncate">
+    <div className="bg-sky-blue text-white py-1.5 sm:py-2 md:py-3 px-2 sm:px-3 md:px-4 text-center text-[10px] sm:text-xs md:text-sm font-medium relative">
+      <div className="max-w-7xl mx-auto flex justify-between items-center flex-col sm:flex-row gap-1 sm:gap-2 md:gap-3">
+        <div className="flex-1 flex items-center justify-center min-w-0 px-1">
+          <span className="line-clamp-1 sm:line-clamp-2 md:line-clamp-3">
             📢 {currentAnnouncement.title}: {currentAnnouncement.content}
           </span>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0">
           {allAnnouncements.length > 1 && (
-            <div className="flex gap-1.5">
+            <div className="flex gap-1 sm:gap-1.5">
               {allAnnouncements.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors ${
+                  className={`w-1 h-1 sm:w-1.5 sm:h-1.5 md:w-2 md:h-2 rounded-full transition-colors ${
                     index === currentIndex ? 'bg-white' : 'bg-white/50'
                   }`}
                   aria-label={`Go to announcement ${index + 1}`}
@@ -111,10 +111,10 @@ export default function AnnouncementsBar() {
           )}
           <button
             onClick={() => setIsVisible(false)}
-            className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
+            className="text-white/80 hover:text-white transition-colors p-0.5 sm:p-1 hover:bg-white/10 rounded"
             aria-label="Close announcements"
           >
-            <X size={18} />
+            <X size={14} className="sm:size-[16px] md:size-[18px]" />
           </button>
         </div>
       </div>
