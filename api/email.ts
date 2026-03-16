@@ -5,7 +5,6 @@ dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const adminEmail = process.env.ADMIN_EMAIL || 'thechoiceiconschools@gmail.com';
-const testEmails = ['divinetonyezimchukwu@gmail.com']; // Add your email here for testing
 
 interface EmailData {
   name: string;
@@ -20,22 +19,13 @@ export async function sendAdminEmail(data: EmailData) {
   try {
     console.log('🔧 Preparing admin email for:', data.email);
     console.log('📧 Admin email destination:', adminEmail);
-    console.log('� Test email destinations:', testEmails);
-    console.log('📧 All recipients:', [adminEmail, ...testEmails]);
-    console.log('�🔑 Resend API Key configured:', !!process.env.RESEND_API_KEY);
-    console.log('📝 Email content preview:', {
-      name: data.name,
-      phone: data.phone,
-      message: data.message.substring(0, 100) + '...',
-      type: data.type
-    });
 
     const typeLabel = data.type || 'Contact';
     const typeColor = data.type === 'Admission' ? '#EF4444' : data.type === 'Career' ? '#F59E0B' : '#EC4899';
 
     const response = await resend.emails.send({
       from: 'Choice Icon Schools <info@choiceiconschools.com>',
-      to: [adminEmail, ...testEmails], // Send to both school and test emails
+      to: adminEmail, // Send only to official school admin email
       replyTo: data.email,
       subject: `New ${typeLabel} Form Submission - Choice Icon Schools`,
       html: `

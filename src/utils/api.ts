@@ -58,10 +58,13 @@ export const api = {
     return response.json();
   },
 
-  submitCareerApplication: async (formData: FormData) => {
+  submitCareerApplication: async (data: { name: string; email: string; phone: string; gender: string; maritalStatus: string; dob: string; qualification: string; address: string; cvFileName?: string; cvFile?: string }) => {
     const response = await fetch(`${API_BASE_URL}/career-upload`, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     });
     return response.json();
   },

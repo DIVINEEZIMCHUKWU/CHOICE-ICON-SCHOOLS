@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Helmet } from 'react-helmet-async';
 
@@ -6,11 +6,17 @@ import { useForm } from 'react-hook-form';
 
 import { supabase } from '../lib/supabase';
 
+import { api } from '../utils/api';
+
+import { CheckCircle } from 'lucide-react';
+
 
 
 export default function Careers() {
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
 
 
@@ -52,55 +58,37 @@ export default function Careers() {
 
       }
 
+      const responseData = await api.submitCareerApplication({
 
+        name: `${data.surname} ${data.firstName}`,
 
-      const response = await fetch('/api/career-upload', {
+        email: data.email,
 
-        method: 'POST',
+        phone: data.phone,
 
-        headers: {
+        gender: data.gender,
 
-          'Content-Type': 'application/json',
+        maritalStatus: data.maritalStatus,
 
-        },
+        dob: data.dob,
 
-        body: JSON.stringify({
+        qualification: data.qualification,
 
-          email: data.email,
+        address: data.address,
 
-          name: `${data.surname} ${data.firstName}`,
+        cvFileName,
 
-          phone: data.phone,
-
-          gender: data.gender,
-
-          maritalStatus: data.maritalStatus,
-
-          dob: data.dob,
-
-          qualification: data.qualification,
-
-          address: data.address,
-
-          cvFileName,
-
-          cvFile,
-
-        }),
+        cvFile,
 
       });
 
-
-
-      if (!response.ok) {
+      if (!responseData.success) {
 
         throw new Error('Failed to submit career application');
 
       }
 
-
-
-      alert('Application submitted successfully!');
+      setIsSubmitted(true);
 
       reset();
 
@@ -171,6 +159,22 @@ export default function Careers() {
 
 
           <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+
+            {isSubmitted ? (
+
+              <div className="bg-green-50 text-green-800 p-6 rounded-xl flex flex-col items-center text-center">
+
+                <CheckCircle size={48} className="mb-4 text-green-500" />
+
+                <h3 className="text-xl font-bold mb-2">Application Submitted!</h3>
+
+                <p>Thank you for your interest in joining our team. We will review your application and contact you soon.</p>
+
+                <button onClick={() => setIsSubmitted(false)} className="mt-6 text-green-600 font-semibold hover:underline">Submit another application</button>
+
+              </div>
+
+            ) : (
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
@@ -321,6 +325,8 @@ export default function Careers() {
               </button>
 
             </form>
+
+            )}
 
           </div>
 

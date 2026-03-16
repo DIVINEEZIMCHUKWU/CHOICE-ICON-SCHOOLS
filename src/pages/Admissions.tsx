@@ -10,6 +10,8 @@ import { supabase } from '../lib/supabase';
 
 import { api } from '../utils/api';
 
+export default function Admissions() {
+
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
 
   const { register: registerFeedback, handleSubmit: handleSubmitFeedback, reset: resetFeedback } = useForm();
