@@ -119,6 +119,7 @@ export default function Sidebar() {
           <span>Logout</span>
         </button>
       </div>
+      </div>
     </>
   );
 }
