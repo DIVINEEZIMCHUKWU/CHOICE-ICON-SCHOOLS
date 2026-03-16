@@ -52,7 +52,13 @@ export default function AnnouncementsBar() {
     // Listen for settings updates
     const handleSettingsUpdate = (event: any) => {
       console.log('🔍 AnnouncementsBar: Settings update detected, refreshing...');
+      console.log('🔍 AnnouncementsBar: Event detail:', event.detail);
       fetchData();
+      // Also update immediately with the new value
+      if (event.detail?.key === 'announcement_bar' && event.detail?.value) {
+        console.log('🔍 AnnouncementsBar: Immediate update for announcement_bar:', event.detail.value);
+        setSettings(prev => ({ ...prev, announcement_bar: event.detail.value }));
+      }
     };
     
     // Listen for storage events (cross-tab updates)

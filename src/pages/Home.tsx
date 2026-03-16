@@ -28,7 +28,7 @@ export default function Home() {
     const fetchEvents = async () => {
       try {
         console.log('🔍 Homepage: Fetching events...');
-        const response = await fetch('/api/events');
+        const response = await fetch(`${API_BASE_URL}/events`);
         console.log('🔍 Homepage: Events response status:', response.status);
         if (response.ok) {
           const data = await response.json();

@@ -74,7 +74,7 @@ export default function Events() {
       const fileInput = document.getElementById('event-image') as HTMLInputElement;
       if (fileInput && fileInput.files && fileInput.files[0]) {
         console.log('🔍 AdminEvents: File selected:', fileInput.files[0].name);
-        submitFormData.append('file', fileInput.files[0]);
+        submitFormData.append('image', fileInput.files[0]);  // Changed from 'file' to 'image'
       } else {
         console.log('🔍 AdminEvents: No file selected');
       }

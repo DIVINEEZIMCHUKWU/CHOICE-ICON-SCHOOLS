@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Calendar, MapPin, Clock } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 import { supabase } from '../lib/supabase';
 
 interface Event {

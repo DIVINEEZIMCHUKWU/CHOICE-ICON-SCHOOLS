@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
+import { API_BASE_URL } from '../config/api';
 import { Helmet } from 'react-helmet-async';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -39,7 +40,7 @@ export default function Gallery() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/gallery');
+        const response = await fetch(`${API_BASE_URL}/gallery`);
         if (response.ok) {
           const data = await response.json();
           const imagesData = data.data.filter((item: any) => item.type === 'image');
