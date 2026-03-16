@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Trash2, Download } from 'lucide-react';
+import { api } from '../../utils/api';
 import { supabase } from '../../lib/supabase';
 
 interface JobApplication {
@@ -41,15 +42,21 @@ export default function AdminJobs() {
 
   const fetchApplications = async () => {
     try {
-      const { data, error } = await supabase
-        .from('job_applications')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log('💼 Fetching job applications data...');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('💼 No token found');
+        setApplications([]);
+        setIsLoading(false);
+        return;
+      }
 
-      if (error) throw error;
-      setApplications(data || []);
+      const data = await api.getJobs(token);
+      console.log('💼 Job applications data received:', data);
+      setApplications(data.data || []);
     } catch (error) {
-      console.error('Error fetching applications:', error);
+      console.error('💼 Error fetching job applications:', error);
+      setApplications([]);
     } finally {
       setIsLoading(false);
     }

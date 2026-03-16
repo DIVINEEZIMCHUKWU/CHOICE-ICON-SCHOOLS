@@ -104,9 +104,18 @@ export default function Events() {
       console.log('🔍 AdminEvents: Response headers:', response.headers);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('🔍 AdminEvents: Error response:', errorData);
-        throw new Error(errorData.error || 'Failed to save event');
+        const contentType = response.headers.get('content-type');
+        console.error('🔍 AdminEvents: Response content-type:', contentType);
+        
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          console.error('🔍 AdminEvents: Error response:', errorData);
+          throw new Error(errorData.error || 'Failed to save event');
+        } else {
+          const textError = await response.text();
+          console.error('🔍 AdminEvents: HTML error response:', textError);
+          throw new Error('Server returned HTML instead of JSON. Check backend logs.');
+        }
       }
 
       const responseData = await response.json();

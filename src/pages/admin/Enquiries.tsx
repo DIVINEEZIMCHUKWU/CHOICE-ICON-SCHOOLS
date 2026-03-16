@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Trash2, Mail, CheckCircle } from 'lucide-react';
+import { api } from '../../utils/api';
 
 interface Enquiry {
   id: number;
@@ -23,21 +24,21 @@ export default function AdminEnquiries() {
 
   const fetchEnquiries = async () => {
     try {
+      console.log('📧 Fetching enquiries data...');
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (!token) {
+        console.error('📧 No token found');
+        setEnquiries([]);
+        setIsLoading(false);
+        return;
       }
 
-      const response = await fetch('/api/enquiries', { headers });
-      if (response.ok) {
-        const data = await response.json();
-        setEnquiries(data.data);
-      } else {
-        console.error('Failed to fetch enquiries');
-      }
+      const data = await api.getEnquiries(token);
+      console.log('📧 Enquiries data received:', data);
+      setEnquiries(data.data || []);
     } catch (error) {
-      console.error('Error fetching enquiries:', error);
+      console.error('📧 Error fetching enquiries:', error);
+      setEnquiries([]);
     } finally {
       setIsLoading(false);
     }
@@ -47,20 +48,12 @@ export default function AdminEnquiries() {
     if (window.confirm('Are you sure you want to delete this enquiry?')) {
       try {
         const token = localStorage.getItem('token');
-        const headers: HeadersInit = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+        if (!token) {
+          alert('Authentication required. Please login again.');
+          return;
         }
 
-        const response = await fetch(`/api/enquiries/${id}`, {
-          method: 'DELETE',
-          headers
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to delete enquiry');
-        }
-
+        await api.deleteEnquiry(id.toString(), token);
         fetchEnquiries();
       } catch (error) {
         console.error('Error deleting enquiry:', error);

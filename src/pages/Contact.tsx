@@ -214,7 +214,7 @@ export default function Contact() {
 
                     <div className="flex gap-3">
                       <a 
-                        href="https://www.facebook.com/your-facebook-page" 
+                        href="https://www.facebook.com/thechoiceiconschools" 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="text-blue-600 hover:text-blue-700 transition-colors"
@@ -256,7 +256,7 @@ export default function Contact() {
 
             {/* Map */}
 
-            <div className="h-[250px] sm:h-[300px] md:h-[400px] bg-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+            <div className="relative h-[250px] sm:h-[300px] md:h-[400px] bg-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
 
               <iframe 
 
@@ -275,6 +275,19 @@ export default function Contact() {
                 referrerPolicy="no-referrer-when-downgrade"
 
               ></iframe>
+
+              {/* Open in Maps Button */}
+              <a 
+                href="https://www.google.com/maps/place/The+Choice+ICON+Schools/@6.1861331,6.5262925,17z/data=!3m1!4b1!4m6!3m5!1s0x1043e5b50c4631a9:0xad0e881adb6e7881!8m2!3d6.1861331!4d6.5262925!16s%2Fg%2F11rsr5w5rr?entry=ttu&g_ep=EgoyMDI2MDMxMS4wIKXMDSoASAFQAw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-4 right-4 bg-white hover:bg-gray-50 text-navy-blue px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-md transition-all duration-200 text-xs sm:text-sm font-medium flex items-center gap-2 hover:shadow-lg"
+              >
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+                Open in Maps
+              </a>
 
             </div>
 

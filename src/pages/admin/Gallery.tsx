@@ -65,11 +65,12 @@ export default function AdminGallery() {
 
     try {
       setUploading(true);
+      console.log('🖼️ Uploading gallery image...');
       
+      // First upload the image
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('title', data.title || 'Gallery Image');
-      formData.append('category', data.category || 'General');
+      formData.append('bucket', 'gallery-images');
       
       const token = localStorage.getItem('token');
       const headers: HeadersInit = {};
@@ -77,21 +78,51 @@ export default function AdminGallery() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${API_BASE_URL}/gallery/image`, {
+      console.log('📤 Uploading to /api/upload...');
+      const uploadResponse = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
         headers,
         body: formData
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        console.error('❌ Upload error:', errorData);
         throw new Error(errorData.error || 'Failed to upload image');
       }
 
+      const uploadData = await uploadResponse.json();
+      console.log('✅ Upload success:', uploadData);
+      
+      // Then save to gallery table
+      const galleryData = {
+        title: data.title || 'Gallery Image',
+        category: data.category || 'General',
+        image_url: uploadData.url,
+        type: 'image'
+      };
+
+      console.log('💾 Saving to gallery table...');
+      const galleryResponse = await fetch(`${API_BASE_URL}/gallery`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(galleryData)
+      });
+
+      if (!galleryResponse.ok) {
+        const errorData = await galleryResponse.json();
+        console.error('❌ Gallery save error:', errorData);
+        throw new Error(errorData.error || 'Failed to save to gallery');
+      }
+
+      console.log('✅ Gallery item saved successfully');
       fetchData();
       resetImage();
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('❌ Gallery upload error:', error);
       alert('Failed to upload image');
     } finally {
       setUploading(false);
@@ -100,34 +131,46 @@ export default function AdminGallery() {
 
   const onVideoSubmit = async (data: any) => {
     try {
+      console.log('🎥 Adding gallery video...');
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/gallery/video`, {
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const videoData = {
+        title: data.title,
+        url: data.url,
+        type: data.url.includes('drive.google.com') ? 'googledrive' : 'youtube'
+      };
+
+      console.log('📤 Sending video data:', videoData);
+      const response = await fetch(`${API_BASE_URL}/gallery`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          title: data.title,
-          url: data.url,
-          type: data.url.includes('drive.google.com') ? 'googledrive' : 'youtube'
+          ...videoData,
+          type: 'video'
         })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('❌ Video add error:', errorData);
         throw new Error(errorData.error || 'Failed to add video');
       }
 
+      console.log('✅ Video added successfully');
       fetchData();
       resetVideo();
       alert('Video added successfully!');
     } catch (error) {
-      console.error('Error adding video:', error);
+      console.error('❌ Video add error:', error);
       alert('Failed to add video.');
     }
   };

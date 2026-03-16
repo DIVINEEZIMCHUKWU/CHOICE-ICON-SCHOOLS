@@ -218,7 +218,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {/* Newsletter/Map */}
             <div>
               <h4 className="text-base font-bold mb-6 border-b border-sky-blue inline-block pb-2">Locate Us</h4>
-              <div className="bg-gray-800 h-32 md:h-40 rounded-lg overflow-hidden relative">
+              <div className="bg-gray-800 h-32 md:h-40 rounded-lg overflow-hidden relative group">
                 {/* Placeholder for map */}
                 <iframe 
                   src="https://maps.google.com/maps?width=100%25&height=600&hl=en&q=Ogwashi-Uku,%20Delta%20State+(The%20Choice%20ICON%20Schools)&t=&z=14&ie=UTF8&iwloc=B&output=embed" 
@@ -228,8 +228,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   allowFullScreen 
                   loading="lazy" 
                   referrerPolicy="no-referrer-when-downgrade"
-                  className="opacity-70 hover:opacity-100 transition-opacity"
+                  className="opacity-70 group-hover:opacity-100 transition-opacity"
                 ></iframe>
+                {/* Maps Button */}
+                <a 
+                  href="https://www.google.com/maps/place/The+Choice+ICON+Schools/@6.1861331,6.5262925,17z/data=!3m1!4b1!4m6!3m5!1s0x1043e5b50c4631a9:0xad0e881adb6e7881!8m2!3d6.1861331!4d6.5262925!16s%2Fg%2F11rsr5w5rr?entry=ttu&g_ep=EgoyMDI2MDMxMS4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-gray-800 px-2 py-1 sm:px-3 sm:py-1.5 rounded shadow-md transition-all duration-200 text-xs font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100"
+                >
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  Maps
+                </a>
               </div>
             </div>
           </div>

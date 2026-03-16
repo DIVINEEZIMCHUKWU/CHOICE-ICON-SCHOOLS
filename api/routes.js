@@ -254,6 +254,75 @@ router.post('/career', async (req, res) => {
   }
 });
 
+// POST /api/upload - Handle image uploads for blog and gallery
+router.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    console.log('📤 Image upload request received');
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const { bucket = 'uploads' } = req.body;
+    const file = req.file;
+    const timestamp = Date.now();
+    const uniqueFileName = `${timestamp}_${file.originalname}`;
+
+    console.log('📁 Uploading image to Supabase storage...');
+    
+    // Check if bucket exists, create if not
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const bucketExists = buckets?.some(b => b.name === bucket);
+    
+    if (!bucketExists) {
+      console.log('📦 Creating bucket:', bucket);
+      const { error: createError } = await supabase.storage.createBucket(bucket, {
+        public: true,
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+        fileSizeLimit: 10485760 // 10MB
+      });
+      
+      if (createError) {
+        console.error('❌ Bucket creation error:', createError);
+        throw new Error(`Failed to create bucket: ${createError.message}`);
+      }
+    }
+
+    // Upload to Supabase storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(uniqueFileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('❌ Image upload error:', uploadError);
+      throw new Error(`Failed to upload image: ${uploadError.message}`);
+    }
+
+    console.log('✅ Image uploaded successfully:', uploadData);
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(uniqueFileName);
+
+    const imageUrl = publicUrlData.publicUrl;
+    console.log('🔗 Image public URL generated:', imageUrl);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Image uploaded successfully',
+      url: imageUrl
+    });
+
+  } catch (error) {
+    console.error('❌ Image upload error:', error);
+    return res.status(500).json({ error: `Failed to upload image: ${error.message}` });
+  }
+});
+
 // POST /api/career-upload - Handle career form with file upload
 router.post('/career-upload', async (req, res) => {
   try {
@@ -866,6 +935,108 @@ router.delete('/blog/:id', async (req, res) => {
   }
 });
 
+// POST /api/announcements - Create new announcement
+router.post('/announcements', async (req, res) => {
+  try {
+    console.log('📢 Creating new announcement...');
+    const { title, content, is_active } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
+    }
+
+    const { data, error } = await supabase
+      .from('announcements')
+      .insert([{
+        title,
+        content,
+        is_active: is_active !== undefined ? is_active : true
+      }])
+      .select();
+
+    if (error) {
+      console.error('❌ Announcement creation error:', error);
+      return res.status(500).json({ error: 'Failed to create announcement' });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: 'Announcement created successfully',
+      data: data?.[0]
+    });
+  } catch (error) {
+    console.error('❌ Announcement creation error:', error);
+    return res.status(500).json({ error: 'Failed to create announcement' });
+  }
+});
+
+// PUT /api/announcements/:id - Update announcement
+router.put('/announcements/:id', async (req, res) => {
+  try {
+    console.log('📢 Updating announcement...');
+    const { id } = req.params;
+    const { title, content, is_active } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
+    }
+
+    const { data, error } = await supabase
+      .from('announcements')
+      .update({
+        title,
+        content,
+        is_active: is_active !== undefined ? is_active : true
+      })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('❌ Announcement update error:', error);
+      return res.status(500).json({ error: 'Failed to update announcement' });
+    }
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: 'Announcement not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Announcement updated successfully',
+      data: data[0]
+    });
+  } catch (error) {
+    console.error('❌ Announcement update error:', error);
+    return res.status(500).json({ error: 'Failed to update announcement' });
+  }
+});
+
+// DELETE /api/announcements/:id - Delete announcement
+router.delete('/announcements/:id', async (req, res) => {
+  try {
+    console.log('🗑️ Deleting announcement...');
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('announcements')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('❌ Announcement deletion error:', error);
+      return res.status(500).json({ error: 'Failed to delete announcement' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Announcement deleted successfully'
+    });
+  } catch (error) {
+    console.error('❌ Announcement deletion error:', error);
+    return res.status(500).json({ error: 'Failed to delete announcement' });
+  }
+});
+
 // GET /api/announcements - Get all active announcements for public
 router.get('/announcements', async (req, res) => {
   try {
@@ -888,6 +1059,253 @@ router.get('/announcements', async (req, res) => {
   } catch (error) {
     console.error('❌ Announcements fetch error:', error);
     return res.status(500).json({ error: 'Failed to fetch announcements' });
+  }
+});
+
+// POST /api/gallery - Add new gallery item (image or video)
+router.post('/gallery', async (req, res) => {
+  try {
+    console.log('🖼️ Adding gallery item...');
+    const { title, category, image_url, url, type } = req.body;
+
+    if (!title || !type) {
+      return res.status(400).json({ error: 'Title and type are required' });
+    }
+
+    if (type === 'image' && !image_url) {
+      return res.status(400).json({ error: 'Image URL is required for image type' });
+    }
+
+    if (type === 'video' && !url) {
+      return res.status(400).json({ error: 'Video URL is required for video type' });
+    }
+
+    const { data, error } = await supabase
+      .from('gallery')
+      .insert([{
+        title,
+        category: category || 'General',
+        image_url: type === 'image' ? image_url : null,
+        url: type === 'video' ? url : null,
+        type
+      }])
+      .select();
+
+    if (error) {
+      console.error('❌ Gallery item creation error:', error);
+      return res.status(500).json({ error: 'Failed to create gallery item' });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: 'Gallery item created successfully',
+      data: data?.[0]
+    });
+  } catch (error) {
+    console.error('❌ Gallery item creation error:', error);
+    return res.status(500).json({ error: 'Failed to create gallery item' });
+  }
+});
+
+// POST /api/events - Create new event
+router.post('/events', upload.single('image'), async (req, res) => {
+  try {
+    console.log('🎉 Creating new event...');
+    const { title, description, event_date, location } = req.body;
+    const file = req.file;
+
+    if (!title || !description || !event_date || !location) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    let imageUrl = '';
+    
+    if (file) {
+      console.log('📤 Uploading event image...');
+      const timestamp = Date.now();
+      const uniqueFileName = `${timestamp}_${file.originalname}`;
+
+      // Check if bucket exists, create if not
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(b => b.name === 'events');
+      
+      if (!bucketExists) {
+        console.log('📦 Creating events bucket...');
+        const { error: createError } = await supabase.storage.createBucket('events', {
+          public: true,
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+          fileSizeLimit: 10485760 // 10MB
+        });
+        
+        if (createError) {
+          console.error('❌ Bucket creation error:', createError);
+          throw new Error(`Failed to create bucket: ${createError.message}`);
+        }
+      }
+
+      // Upload to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('events')
+        .upload(uniqueFileName, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('❌ Image upload error:', uploadError);
+        throw new Error(`Failed to upload image: ${uploadError.message}`);
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('events')
+        .getPublicUrl(uniqueFileName);
+
+      imageUrl = publicUrlData.publicUrl;
+      console.log('🔗 Event image URL generated:', imageUrl);
+    }
+
+    const { data, error } = await supabase
+      .from('events')
+      .insert([{
+        title,
+        description,
+        event_date,
+        location,
+        image_url: imageUrl
+      }])
+      .select();
+
+    if (error) {
+      console.error('❌ Event creation error:', error);
+      return res.status(500).json({ error: 'Failed to create event' });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: 'Event created successfully',
+      data: data?.[0]
+    });
+  } catch (error) {
+    console.error('❌ Event creation error:', error);
+    return res.status(500).json({ error: `Failed to create event: ${error.message}` });
+  }
+});
+
+// PUT /api/events/:id - Update event
+router.put('/events/:id', upload.single('image'), async (req, res) => {
+  try {
+    console.log('🎉 Updating event...');
+    const { id } = req.params;
+    const { title, description, event_date, location, image_url: existingImageUrl } = req.body;
+    const file = req.file;
+
+    if (!title || !description || !event_date || !location) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    let imageUrl = existingImageUrl || '';
+    
+    if (file) {
+      console.log('📤 Uploading new event image...');
+      const timestamp = Date.now();
+      const uniqueFileName = `${timestamp}_${file.originalname}`;
+
+      // Check if bucket exists, create if not
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(b => b.name === 'events');
+      
+      if (!bucketExists) {
+        console.log('📦 Creating events bucket...');
+        const { error: createError } = await supabase.storage.createBucket('events', {
+          public: true,
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+          fileSizeLimit: 10485760 // 10MB
+        });
+        
+        if (createError) {
+          console.error('❌ Bucket creation error:', createError);
+          throw new Error(`Failed to create bucket: ${createError.message}`);
+        }
+      }
+
+      // Upload to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('events')
+        .upload(uniqueFileName, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('❌ Image upload error:', uploadError);
+        throw new Error(`Failed to upload image: ${uploadError.message}`);
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('events')
+        .getPublicUrl(uniqueFileName);
+
+      imageUrl = publicUrlData.publicUrl;
+      console.log('🔗 Updated event image URL generated:', imageUrl);
+    }
+
+    const { data, error } = await supabase
+      .from('events')
+      .update({
+        title,
+        description,
+        event_date,
+        location,
+        image_url: imageUrl
+      })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('❌ Event update error:', error);
+      return res.status(500).json({ error: 'Failed to update event' });
+    }
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Event updated successfully',
+      data: data[0]
+    });
+  } catch (error) {
+    console.error('❌ Event update error:', error);
+    return res.status(500).json({ error: `Failed to update event: ${error.message}` });
+  }
+});
+
+// DELETE /api/events/:id - Delete event
+router.delete('/events/:id', async (req, res) => {
+  try {
+    console.log('🗑️ Deleting event...');
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('❌ Event deletion error:', error);
+      return res.status(500).json({ error: 'Failed to delete event' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Event deleted successfully'
+    });
+  } catch (error) {
+    console.error('❌ Event deletion error:', error);
+    return res.status(500).json({ error: 'Failed to delete event' });
   }
 });
 
@@ -939,6 +1357,41 @@ router.get('/gallery', async (req, res) => {
   }
 });
 
+// POST /api/settings - Update site settings
+router.post('/settings', async (req, res) => {
+  try {
+    console.log('⚙️ Updating settings...');
+    const { key, value } = req.body;
+
+    if (!key || value === undefined) {
+      return res.status(400).json({ error: 'Key and value are required' });
+    }
+
+    const { data, error } = await supabase
+      .from('settings')
+      .upsert({
+        key,
+        value,
+        updated_at: new Date().toISOString()
+      })
+      .select();
+
+    if (error) {
+      console.error('❌ Settings update error:', error);
+      return res.status(500).json({ error: 'Failed to update setting' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Setting updated successfully',
+      data: data?.[0]
+    });
+  } catch (error) {
+    console.error('❌ Settings update error:', error);
+    return res.status(500).json({ error: 'Failed to update setting' });
+  }
+});
+
 // GET /api/settings - Get site settings for public
 router.get('/settings', async (req, res) => {
   try {
@@ -957,6 +1410,57 @@ router.get('/settings', async (req, res) => {
   } catch (error) {
     console.error('❌ Settings fetch error:', error);
     return res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+// POST /api/settings/change-password - Change admin password
+router.post('/settings/change-password', async (req, res) => {
+  try {
+    console.log('🔐 Changing admin password...');
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current password and new password are required' });
+    }
+
+    // Verify current password by trying to login
+    const { data: adminUser, error: fetchError } = await supabase
+      .from('admin_users')
+      .select('*')
+      .eq('email', 'thechoiceiconschools@gmail.com')
+      .single();
+
+    if (fetchError || !adminUser) {
+      return res.status(401).json({ error: 'Admin user not found' });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, adminUser.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    const { error: updateError } = await supabase
+      .from('admin_users')
+      .update({ password: hashedNewPassword })
+      .eq('email', 'thechoiceiconschools@gmail.com');
+
+    if (updateError) {
+      console.error('❌ Password update error:', updateError);
+      return res.status(500).json({ error: 'Failed to update password' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error('❌ Password change error:', error);
+    return res.status(500).json({ error: 'Failed to change password' });
   }
 });
 

@@ -97,7 +97,7 @@ export default function AdminBlog() {
     setShowForm(true);
   };
 
-  const uploadImage = async (file: File, bucket: string) => {
+  const uploadImage = async (file: File, bucket: string = 'blog-images') => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('bucket', bucket);
@@ -116,10 +116,12 @@ export default function AdminBlog() {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Upload error response:', errorData);
       throw new Error(errorData.error || 'Failed to upload image');
     }
 
     const data = await response.json();
+    console.log('Upload success:', data);
     return data.url;
   };
 

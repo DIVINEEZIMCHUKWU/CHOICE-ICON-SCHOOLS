@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Users, FileText, CheckCircle, Download, Search, Trash2 } from 'lucide-react';
+import { api } from '../../utils/api';
 
 interface Admission {
   id: number;
@@ -24,23 +25,16 @@ export default function AdminAdmissions() {
     try {
       console.log('🎓 Fetching admissions data...');
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (!token) {
+        console.error('🎓 No token found');
+        setAdmissions([]);
+        setIsLoading(false);
+        return;
       }
 
-      const response = await fetch('/api/admissions', { headers });
-      console.log('🎓 Admissions response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('🎓 Admissions data received:', data);
-        setAdmissions(data.data || []);
-      } else {
-        const errorData = await response.json();
-        console.error('🎓 Admissions fetch error:', errorData);
-        setAdmissions([]);
-      }
+      const data = await api.getAdmissions(token);
+      console.log('🎓 Admissions data received:', data);
+      setAdmissions(data.data || []);
     } catch (error) {
       console.error('🎓 Error fetching admissions:', error);
       setAdmissions([]);
@@ -53,20 +47,12 @@ export default function AdminAdmissions() {
     if (window.confirm('Are you sure you want to delete this admission?')) {
       try {
         const token = localStorage.getItem('token');
-        const headers: HeadersInit = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+        if (!token) {
+          alert('Authentication required. Please login again.');
+          return;
         }
 
-        const response = await fetch(`/api/admissions/${id}`, {
-          method: 'DELETE',
-          headers
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to delete admission');
-        }
-
+        await api.deleteAdmission(id.toString(), token);
         fetchAdmissions();
       } catch (error) {
         console.error('Error deleting admission:', error);
@@ -78,23 +64,12 @@ export default function AdminAdmissions() {
   const handleStatusChange = async (id: number, newStatus: string) => {
     try {
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        return;
       }
 
-      const response = await fetch(`/api/admissions/${id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update status');
-      }
-
+      await api.updateAdmission(id.toString(), { status: newStatus }, token);
       fetchAdmissions();
     } catch (error) {
       console.error('Error updating status:', error);

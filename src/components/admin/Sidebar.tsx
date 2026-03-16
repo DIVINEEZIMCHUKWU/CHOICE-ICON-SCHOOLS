@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -14,11 +14,14 @@ import {
   LogOut,
   Globe,
   BookOpen,
-  Home
+  Home,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function Sidebar() {
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} /> },
@@ -45,7 +48,27 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="bg-navy-blue text-white w-64 min-h-screen flex flex-col shadow-2xl z-40">
+    <>
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 bg-navy-blue text-white p-3 rounded-lg shadow-lg"
+      >
+        {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`bg-navy-blue text-white w-64 min-h-screen flex flex-col shadow-2xl z-40 fixed lg:static transform transition-transform duration-300 ease-in-out ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
       <div className="p-6 border-b border-white/5">
         <div className="flex items-center gap-3">
           <img 
@@ -96,6 +119,6 @@ export default function Sidebar() {
           <span>Logout</span>
         </button>
       </div>
-    </div>
+    </>
   );
 }

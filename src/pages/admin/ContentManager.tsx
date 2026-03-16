@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Globe, Phone, Mail, MapPin, Facebook } from 'lucide-react';
+import { API_BASE_URL } from '../../config/api';
 
 export default function ContentManager() {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -12,11 +13,18 @@ export default function ContentManager() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/settings');
-      const data = await response.json();
-      setSettings(data);
+      console.log('🔧 ContentManager: Fetching settings...');
+      const response = await fetch(`${API_BASE_URL}/settings`);
+      console.log('🔧 ContentManager: Response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔧 ContentManager: Settings data received:', data);
+        setSettings(data);
+      } else {
+        console.error('🔧 ContentManager: Failed to fetch settings');
+      }
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      console.error('🔧 ContentManager: Error fetching settings:', error);
     } finally {
       setLoading(false);
     }
@@ -25,7 +33,7 @@ export default function ContentManager() {
   const updateSetting = async (key: string, value: string) => {
     try {
       console.log('🔧 ContentManager: Updating setting:', { key, value });
-      const response = await fetch('/api/settings', {
+      const response = await fetch(`${API_BASE_URL}/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, value }),
@@ -34,6 +42,8 @@ export default function ContentManager() {
       if (response.ok) {
         const data = await response.json();
         console.log('🔧 ContentManager: Response data:', data);
+        // Refresh settings after update
+        fetchSettings();
       } else {
         console.error('🔧 ContentManager: Failed to update setting');
       }
