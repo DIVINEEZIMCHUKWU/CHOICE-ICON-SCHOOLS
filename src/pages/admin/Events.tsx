@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import { Plus, Trash2, Edit2, Calendar, MapPin, Clock, Upload } from 'lucide-react';
 
 interface Event {
@@ -30,7 +31,7 @@ export default function Events() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/events', { headers });
+      const response = await fetch(`${API_BASE_URL}/events`, { headers });
       console.log('🔍 AdminEvents: Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
@@ -85,14 +86,14 @@ export default function Events() {
         if (!fileInput?.files?.[0]) {
           submitFormData.append('image_url', formData.image_url);
         }
-        response = await fetch(`/api/events/${editingEvent.id}`, {
+        response = await fetch(`${API_BASE_URL}/events/${editingEvent.id}`, {
           method: 'PUT',
           headers,
           body: submitFormData
         });
       } else {
         console.log('🔍 AdminEvents: Creating new event...');
-        response = await fetch('/api/events', {
+        response = await fetch(`${API_BASE_URL}/events`, {
           method: 'POST',
           headers,
           body: submitFormData
@@ -131,7 +132,7 @@ export default function Events() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`/api/events/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/events/${id}`, {
         method: 'DELETE',
         headers
       });

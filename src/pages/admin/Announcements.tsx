@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import { Plus, Trash2, Edit2, Bell } from 'lucide-react';
 
 interface Announcement {
@@ -28,7 +29,7 @@ export default function Announcements() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/announcements', { headers });
+      const response = await fetch(`${API_BASE_URL}/announcements`, { headers });
       console.log('🔍 AdminAnnouncements: Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
@@ -62,7 +63,7 @@ export default function Announcements() {
 
       if (editingAnnouncement) {
         console.log('🔍 AdminAnnouncements: Updating announcement...');
-        const response = await fetch(`/api/announcements/${editingAnnouncement.id}`, {
+        const response = await fetch(`${API_BASE_URL}/announcements/${editingAnnouncement.id}`, {
           method: 'PUT',
           headers,
           body: JSON.stringify({
@@ -78,7 +79,7 @@ export default function Announcements() {
         console.log('🔍 AdminAnnouncements: Update successful');
       } else {
         console.log('🔍 AdminAnnouncements: Creating new announcement...');
-        const response = await fetch('/api/announcements', {
+        const response = await fetch(`${API_BASE_URL}/announcements`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -115,7 +116,7 @@ export default function Announcements() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`/api/announcements/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/announcements/${id}`, {
         method: 'DELETE',
         headers
       });

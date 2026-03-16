@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Trash2, Upload, Image as ImageIcon, Video, Plus, Youtube } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { API_BASE_URL } from '../config/api';
 
 interface GalleryImage {
   id: number;
@@ -41,7 +42,7 @@ export default function AdminGallery() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/gallery', { headers });
+      const response = await fetch(`${API_BASE_URL}/gallery`, { headers });
       if (response.ok) {
         const data = await response.json();
         const images = data.data.filter((item: any) => item.type === 'image');
@@ -76,7 +77,7 @@ export default function AdminGallery() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/gallery/image', {
+      const response = await fetch(`${API_BASE_URL}/gallery/image`, {
         method: 'POST',
         headers,
         body: formData
@@ -107,7 +108,7 @@ export default function AdminGallery() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/gallery/video', {
+      const response = await fetch(`${API_BASE_URL}/gallery/video`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -140,7 +141,7 @@ export default function AdminGallery() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`/api/gallery/image/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/gallery/image/${id}`, {
           method: 'DELETE',
           headers
         });
@@ -166,7 +167,7 @@ export default function AdminGallery() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`/api/gallery/video/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/gallery/video/${id}`, {
           method: 'DELETE',
           headers
         });

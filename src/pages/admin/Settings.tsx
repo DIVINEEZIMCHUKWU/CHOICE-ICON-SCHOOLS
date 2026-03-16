@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Key, Save, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 export default function Settings() {
   const [passwordData, setPasswordData] = useState({
@@ -31,7 +32,7 @@ export default function Settings() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/settings/change-password', {
+      const response = await fetch(`${API_BASE_URL}/settings/change-password`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Trash2, Edit, Plus, Image as ImageIcon, X, Save, Upload } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 interface BlogPost {
   id: number;
@@ -36,7 +37,7 @@ export default function AdminBlog() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/blog', { headers });
+      const response = await fetch(`${API_BASE_URL}/blog`, { headers });
       if (response.ok) {
         const data = await response.json();
         setPosts(data.data);
@@ -107,7 +108,7 @@ export default function AdminBlog() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('/api/upload', {
+    const response = await fetch(`${API_BASE_URL}/upload`, {
       method: 'POST',
       headers,
       body: formData
@@ -179,7 +180,7 @@ export default function AdminBlog() {
       }
 
       if (isEditing && currentPost.id) {
-        const response = await fetch(`/api/blog/${currentPost.id}`, {
+        const response = await fetch(`${API_BASE_URL}/blog/${currentPost.id}`, {
           method: 'PUT',
           headers,
           body: JSON.stringify({
@@ -196,7 +197,7 @@ export default function AdminBlog() {
           throw new Error('Failed to update post');
         }
       } else {
-        const response = await fetch('/api/blog', {
+        const response = await fetch(`${API_BASE_URL}/blog`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
