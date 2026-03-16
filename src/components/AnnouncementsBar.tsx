@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { api } from '../utils/api';
 import { X } from 'lucide-react';
 
 interface Announcement {
@@ -21,29 +22,21 @@ export default function AnnouncementsBar() {
         console.log('🔍 AnnouncementsBar: Fetching data...');
         
         // Fetch settings for existing announcement
-        const settingsResponse = await fetch('/api/settings');
-        console.log('🔍 AnnouncementsBar: Settings response:', settingsResponse.status);
-        if (settingsResponse.ok) {
-          const settingsData = await settingsResponse.json();
-          console.log('🔍 AnnouncementsBar: Settings data:', settingsData);
-          setSettings(settingsData);
-        }
+        const settingsData = await api.getSettings();
+        console.log('🔍 AnnouncementsBar: Settings data:', settingsData);
+        setSettings(settingsData);
 
         // Fetch dynamic announcements
-        const announcementsResponse = await fetch('/api/announcements');
-        console.log('🔍 AnnouncementsBar: Announcements response:', announcementsResponse.status);
-        if (announcementsResponse.ok) {
-          const data = await announcementsResponse.json();
-          console.log('🔍 AnnouncementsBar: Announcements data:', data);
-          // Handle both response formats
-          const announcementsArray = Array.isArray(data) ? data : data.data || [];
-          // Only show active announcements (handle both boolean and number)
-          const activeAnnouncements = announcementsArray.filter((a: Announcement) => 
-            a.is_active === true || a.is_active === 1
-          );
-          console.log('🔍 AnnouncementsBar: Active announcements:', activeAnnouncements);
-          setAnnouncements(activeAnnouncements);
-        }
+        const data = await api.getAnnouncements();
+        console.log('🔍 AnnouncementsBar: Announcements data:', data);
+        // Handle both response formats
+        const announcementsArray = Array.isArray(data) ? data : data.data || [];
+        // Only show active announcements (handle both boolean and number)
+        const activeAnnouncements = announcementsArray.filter((a: Announcement) => 
+          a.is_active === true || a.is_active === 1
+        );
+        console.log('🔍 AnnouncementsBar: Active announcements:', activeAnnouncements);
+        setAnnouncements(activeAnnouncements);
       } catch (error) {
         console.error('🔍 AnnouncementsBar: Error fetching data:', error);
       }

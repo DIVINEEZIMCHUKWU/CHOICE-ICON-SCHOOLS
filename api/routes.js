@@ -866,4 +866,98 @@ router.delete('/blog/:id', async (req, res) => {
   }
 });
 
+// GET /api/announcements - Get all active announcements for public
+router.get('/announcements', async (req, res) => {
+  try {
+    console.log('📢 Fetching announcements...');
+    const { data, error } = await supabase
+      .from('announcements')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Announcements fetch error:', error);
+      return res.status(500).json({ error: 'Failed to fetch announcements' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: data || []
+    });
+  } catch (error) {
+    console.error('❌ Announcements fetch error:', error);
+    return res.status(500).json({ error: 'Failed to fetch announcements' });
+  }
+});
+
+// GET /api/events - Get all events for public
+router.get('/events', async (req, res) => {
+  try {
+    console.log('🎉 Fetching events...');
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('event_date', { ascending: false });
+
+    if (error) {
+      console.error('❌ Events fetch error:', error);
+      return res.status(500).json({ error: 'Failed to fetch events' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: data || []
+    });
+  } catch (error) {
+    console.error('❌ Events fetch error:', error);
+    return res.status(500).json({ error: 'Failed to fetch events' });
+  }
+});
+
+// GET /api/gallery - Get all gallery items for public
+router.get('/gallery', async (req, res) => {
+  try {
+    console.log('🖼️ Fetching gallery...');
+    const { data, error } = await supabase
+      .from('gallery')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Gallery fetch error:', error);
+      return res.status(500).json({ error: 'Failed to fetch gallery' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: data || []
+    });
+  } catch (error) {
+    console.error('❌ Gallery fetch error:', error);
+    return res.status(500).json({ error: 'Failed to fetch gallery' });
+  }
+});
+
+// GET /api/settings - Get site settings for public
+router.get('/settings', async (req, res) => {
+  try {
+    console.log('⚙️ Fetching settings...');
+    const { data, error } = await supabase
+      .from('settings')
+      .select('*')
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      console.error('❌ Settings fetch error:', error);
+      return res.status(500).json({ error: 'Failed to fetch settings' });
+    }
+
+    return res.status(200).json(data || {});
+  } catch (error) {
+    console.error('❌ Settings fetch error:', error);
+    return res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
 export default router;
