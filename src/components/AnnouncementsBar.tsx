@@ -24,7 +24,9 @@ export default function AnnouncementsBar() {
         // Fetch settings for existing announcement
         const settingsData = await api.getSettings();
         console.log('🔍 AnnouncementsBar: Settings data:', settingsData);
-        setSettings(settingsData);
+        // Handle both single object and wrapped response formats
+        const settings = settingsData.data || settingsData;
+        setSettings(settings || {});
 
         // Fetch dynamic announcements
         const data = await api.getAnnouncements();
@@ -48,16 +50,24 @@ export default function AnnouncementsBar() {
     const interval = setInterval(fetchData, 30000);
     
     // Listen for settings updates
-    const handleSettingsUpdate = () => {
+    const handleSettingsUpdate = (event: any) => {
       console.log('🔍 AnnouncementsBar: Settings update detected, refreshing...');
       fetchData();
     };
     
+    // Listen for storage events (cross-tab updates)
+    const handleStorageChange = () => {
+      console.log('🔍 AnnouncementsBar: Storage change detected, refreshing...');
+      fetchData();
+    };
+    
     window.addEventListener('settingsUpdated', handleSettingsUpdate);
+    window.addEventListener('storage', handleStorageChange);
     
     return () => {
       clearInterval(interval);
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
@@ -77,6 +87,7 @@ export default function AnnouncementsBar() {
   console.log('🔍 AnnouncementsBar: Current index:', currentIndex);
   console.log('🔍 AnnouncementsBar: Is visible:', isVisible);
   console.log('🔍 AnnouncementsBar: Settings announcement_bar:', settings.announcement_bar);
+  console.log('🔍 AnnouncementsBar: Full settings object:', settings);
 
   const currentAnnouncement = allAnnouncements[currentIndex];
   console.log('🔍 AnnouncementsBar: Current announcement:', currentAnnouncement);

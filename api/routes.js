@@ -1072,28 +1072,53 @@ router.post('/gallery', async (req, res) => {
       return res.status(400).json({ error: 'Title and type are required' });
     }
 
-    if (type === 'image' && !image_url) {
-      return res.status(400).json({ error: 'Image URL is required for image type' });
+    let data, error;
+    
+    if (type === 'image') {
+      if (!image_url) {
+        return res.status(400).json({ error: 'Image URL is required for image type' });
+      }
+      
+      // Insert into gallery_images table
+      const result = await supabase
+        .from('gallery_images')
+        .insert([{
+          title,
+          category: category || 'General',
+          image_url,
+          created_at: new Date().toISOString()
+        }])
+        .select();
+      
+      data = result.data;
+      error = result.error;
+      
+    } else if (type === 'video') {
+      if (!url) {
+        return res.status(400).json({ error: 'Video URL is required for video type' });
+      }
+      
+      // Insert into gallery_videos table
+      const result = await supabase
+        .from('gallery_videos')
+        .insert([{
+          title,
+          url,
+          created_at: new Date().toISOString()
+        }])
+        .select();
+      
+      data = result.data;
+      error = result.error;
+      
+    } else {
+      return res.status(400).json({ error: 'Type must be either "image" or "video"' });
     }
-
-    if (type === 'video' && !url) {
-      return res.status(400).json({ error: 'Video URL is required for video type' });
-    }
-
-    const { data, error } = await supabase
-      .from('gallery')
-      .insert([{
-        title,
-        category: category || 'General',
-        image_url: type === 'image' ? image_url : null,
-        url: type === 'video' ? url : null,
-        type
-      }])
-      .select();
 
     if (error) {
       console.error('❌ Gallery item creation error:', error);
-      return res.status(500).json({ error: 'Failed to create gallery item' });
+      console.error('❌ Error details:', error.message, error.details, error.hint);
+      return res.status(500).json({ error: 'Failed to create gallery item', details: error.message });
     }
 
     return res.status(201).json({
@@ -1128,11 +1153,11 @@ router.post('/events', upload.single('image'), async (req, res) => {
 
       // Check if bucket exists, create if not
       const { data: buckets } = await supabase.storage.listBuckets();
-      const bucketExists = buckets?.some(b => b.name === 'events');
+      const bucketExists = buckets?.some(b => b.name === 'event-images');
       
       if (!bucketExists) {
         console.log('📦 Creating events bucket...');
-        const { error: createError } = await supabase.storage.createBucket('events', {
+        const { error: createError } = await supabase.storage.createBucket('event-images', {
           public: true,
           allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
           fileSizeLimit: 10485760 // 10MB
@@ -1146,7 +1171,7 @@ router.post('/events', upload.single('image'), async (req, res) => {
 
       // Upload to Supabase storage
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('events')
+        .from('event-images')
         .upload(uniqueFileName, file.buffer, {
           contentType: file.mimetype,
           upsert: false
@@ -1159,7 +1184,7 @@ router.post('/events', upload.single('image'), async (req, res) => {
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
-        .from('events')
+        .from('event-images')
         .getPublicUrl(uniqueFileName);
 
       imageUrl = publicUrlData.publicUrl;
@@ -1173,13 +1198,15 @@ router.post('/events', upload.single('image'), async (req, res) => {
         description,
         event_date,
         location,
-        image_url: imageUrl
+        image_url: imageUrl,
+        created_at: new Date().toISOString()
       }])
       .select();
 
     if (error) {
       console.error('❌ Event creation error:', error);
-      return res.status(500).json({ error: 'Failed to create event' });
+      console.error('❌ Error details:', error.message, error.details, error.hint);
+      return res.status(500).json({ error: 'Failed to create event', details: error.message });
     }
 
     return res.status(201).json({
@@ -1232,7 +1259,7 @@ router.put('/events/:id', upload.single('image'), async (req, res) => {
 
       // Upload to Supabase storage
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('events')
+        .from('event-images')
         .upload(uniqueFileName, file.buffer, {
           contentType: file.mimetype,
           upsert: false
@@ -1245,7 +1272,7 @@ router.put('/events/:id', upload.single('image'), async (req, res) => {
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
-        .from('events')
+        .from('event-images')
         .getPublicUrl(uniqueFileName);
 
       imageUrl = publicUrlData.publicUrl;
@@ -1338,23 +1365,101 @@ router.get('/events', async (req, res) => {
 router.get('/gallery', async (req, res) => {
   try {
     console.log('🖼️ Fetching gallery...');
-    const { data, error } = await supabase
-      .from('gallery')
-      .select('*')
-      .order('created_at', { ascending: false });
+    
+    // Fetch from both tables
+    const [imagesResult, videosResult] = await Promise.all([
+      supabase
+        .from('gallery_images')
+        .select('*')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('gallery_videos')
+        .select('*')
+        .order('created_at', { ascending: false })
+    ]);
 
-    if (error) {
-      console.error('❌ Gallery fetch error:', error);
-      return res.status(500).json({ error: 'Failed to fetch gallery' });
+    if (imagesResult.error) {
+      console.error('❌ Gallery images fetch error:', imagesResult.error);
+      return res.status(500).json({ error: 'Failed to fetch gallery images' });
     }
+
+    if (videosResult.error) {
+      console.error('❌ Gallery videos fetch error:', videosResult.error);
+      return res.status(500).json({ error: 'Failed to fetch gallery videos' });
+    }
+
+    // Combine results and add type field
+    const images = (imagesResult.data || []).map(img => ({ ...img, type: 'image' }));
+    const videos = (videosResult.data || []).map(video => ({ ...video, type: 'video' }));
+    
+    const allItems = [...images, ...videos].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
     return res.status(200).json({
       success: true,
-      data: data || []
+      data: allItems
     });
   } catch (error) {
     console.error('❌ Gallery fetch error:', error);
     return res.status(500).json({ error: 'Failed to fetch gallery' });
+  }
+});
+
+// DELETE /api/gallery/:id - Delete gallery item
+router.delete('/gallery/:id', async (req, res) => {
+  try {
+    console.log('🗑️ Deleting gallery item...');
+    const { id } = req.params;
+    const { type } = req.query;
+
+    if (!id) {
+      return res.status(400).json({ error: 'ID is required' });
+    }
+
+    let error;
+    
+    if (type === 'image') {
+      // Delete from gallery_images table
+      const result = await supabase
+        .from('gallery_images')
+        .delete()
+        .eq('id', id);
+      error = result.error;
+      
+    } else if (type === 'video') {
+      // Delete from gallery_videos table
+      const result = await supabase
+        .from('gallery_videos')
+        .delete()
+        .eq('id', id);
+      error = result.error;
+      
+    } else {
+      // Try both tables if type not specified
+      const [imageResult, videoResult] = await Promise.all([
+        supabase.from('gallery_images').delete().eq('id', id),
+        supabase.from('gallery_videos').delete().eq('id', id)
+      ]);
+      
+      // If both failed, return error
+      if (imageResult.error && videoResult.error) {
+        return res.status(404).json({ error: 'Gallery item not found' });
+      }
+    }
+
+    if (error) {
+      console.error('❌ Gallery item deletion error:', error);
+      return res.status(500).json({ error: 'Failed to delete gallery item' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Gallery item deleted successfully'
+    });
+  } catch (error) {
+    console.error('❌ Gallery item deletion error:', error);
+    return res.status(500).json({ error: 'Failed to delete gallery item' });
   }
 });
 
@@ -1379,7 +1484,8 @@ router.post('/settings', async (req, res) => {
 
     if (error) {
       console.error('❌ Settings update error:', error);
-      return res.status(500).json({ error: 'Failed to update setting' });
+      console.error('❌ Error details:', error.message, error.details, error.hint);
+      return res.status(500).json({ error: 'Failed to update setting', details: error.message });
     }
 
     return res.status(200).json({

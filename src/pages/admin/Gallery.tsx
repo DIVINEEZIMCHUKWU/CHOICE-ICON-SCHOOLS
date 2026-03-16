@@ -73,7 +73,7 @@ export default function AdminGallery() {
       // First upload the image
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('bucket', 'gallery-images');
+      formData.append('bucket', 'gallery-images');  // Use correct bucket name
       
       const token = localStorage.getItem('token');
       const headers: HeadersInit = {};
@@ -187,7 +187,7 @@ export default function AdminGallery() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/gallery/${id}?type=image`, {
           method: 'DELETE',
           headers
         });
@@ -214,7 +214,7 @@ export default function AdminGallery() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/gallery/${id}?type=video`, {
           method: 'DELETE',
           headers
         });

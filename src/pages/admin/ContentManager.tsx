@@ -44,11 +44,16 @@ export default function ContentManager() {
         console.log('🔧 ContentManager: Response data:', data);
         // Refresh settings after update
         await fetchSettings();
-        // Also trigger a global refresh by dispatching a custom event
+        // Force immediate refresh of announcement bar
         window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: { key, value } }));
+        // Also force a location reload to ensure the announcement bar updates
+        setTimeout(() => {
+          window.dispatchEvent(new Event('storage'));
+        }, 100);
       } else {
-        console.error('🔧 ContentManager: Failed to update setting');
-        alert('Failed to update setting. Please try again.');
+        const errorData = await response.json();
+        console.error('🔧 ContentManager: Failed to update setting:', errorData);
+        alert('Failed to update setting: ' + (errorData.error || 'Please try again.'));
       }
     } catch (error) {
       console.error(`🔧 ContentManager: Error updating setting ${key}:`, error);
