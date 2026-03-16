@@ -61,7 +61,10 @@ export default function AdminGallery() {
 
   const onImageSubmit = async (data: any) => {
     const file = data.image[0];
-    if (!file) return;
+    if (!file) {
+      alert('Please select an image file');
+      return;
+    }
 
     try {
       setUploading(true);
@@ -118,14 +121,16 @@ export default function AdminGallery() {
         throw new Error(errorData.error || 'Failed to save to gallery');
       }
 
-      console.log('✅ Gallery item saved successfully');
+      const galleryResult = await galleryResponse.json();
+      console.log('✅ Gallery save success:', galleryResult);
+      
       fetchData();
-      resetImage();
-    } catch (error) {
-      console.error('❌ Gallery upload error:', error);
-      alert('Failed to upload image');
-    } finally {
       setUploading(false);
+      alert('Image uploaded successfully!');
+    } catch (error) {
+      console.error('❌ Gallery image upload error:', error);
+      setUploading(false);
+      alert('Failed to upload image: ' + (error as Error).message);
     }
   };
 
@@ -146,17 +151,14 @@ export default function AdminGallery() {
       const videoData = {
         title: data.title,
         url: data.url,
-        type: data.url.includes('drive.google.com') ? 'googledrive' : 'youtube'
+        type: 'video'
       };
 
       console.log('📤 Sending video data:', videoData);
       const response = await fetch(`${API_BASE_URL}/gallery`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          ...videoData,
-          type: 'video'
-        })
+        body: JSON.stringify(videoData)
       });
 
       if (!response.ok) {
@@ -165,13 +167,14 @@ export default function AdminGallery() {
         throw new Error(errorData.error || 'Failed to add video');
       }
 
-      console.log('✅ Video added successfully');
+      const result = await response.json();
+      console.log('✅ Video added successfully:', result);
       fetchData();
       resetVideo();
       alert('Video added successfully!');
     } catch (error) {
       console.error('❌ Video add error:', error);
-      alert('Failed to add video.');
+      alert('Failed to add video: ' + (error as Error).message);
     }
   };
 
@@ -184,7 +187,7 @@ export default function AdminGallery() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/gallery/image/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
           method: 'DELETE',
           headers
         });
@@ -194,6 +197,7 @@ export default function AdminGallery() {
         }
 
         fetchData();
+        alert('Image deleted successfully!');
       } catch (error) {
         console.error('Error deleting image:', error);
         alert('Failed to delete image');
@@ -210,7 +214,7 @@ export default function AdminGallery() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/gallery/video/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
           method: 'DELETE',
           headers
         });
@@ -220,6 +224,7 @@ export default function AdminGallery() {
         }
 
         fetchData();
+        alert('Video deleted successfully!');
       } catch (error) {
         console.error('Error deleting video:', error);
         alert('Failed to delete video');

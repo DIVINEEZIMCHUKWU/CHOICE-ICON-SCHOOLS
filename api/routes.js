@@ -1115,6 +1115,7 @@ router.post('/events', upload.single('image'), async (req, res) => {
     const file = req.file;
 
     if (!title || !description || !event_date || !location) {
+      console.error('❌ Missing required fields:', { title, description, event_date, location });
       return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -1139,7 +1140,7 @@ router.post('/events', upload.single('image'), async (req, res) => {
         
         if (createError) {
           console.error('❌ Bucket creation error:', createError);
-          throw new Error(`Failed to create bucket: ${createError.message}`);
+          return res.status(500).json({ error: `Failed to create bucket: ${createError.message}` });
         }
       }
 

@@ -47,7 +47,18 @@ export default function AnnouncementsBar() {
     // Set up auto-refresh every 30 seconds
     const interval = setInterval(fetchData, 30000);
     
-    return () => clearInterval(interval);
+    // Listen for settings updates
+    const handleSettingsUpdate = () => {
+      console.log('🔍 AnnouncementsBar: Settings update detected, refreshing...');
+      fetchData();
+    };
+    
+    window.addEventListener('settingsUpdated', handleSettingsUpdate);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+    };
   }, []);
 
   // Combine static announcement with dynamic announcements

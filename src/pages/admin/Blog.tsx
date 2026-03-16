@@ -60,7 +60,7 @@ export default function AdminBlog() {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`/api/blog/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/blog/${id}`, {
           method: 'DELETE',
           headers
         });

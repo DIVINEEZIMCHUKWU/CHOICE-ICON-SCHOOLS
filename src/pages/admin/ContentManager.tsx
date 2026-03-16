@@ -43,12 +43,16 @@ export default function ContentManager() {
         const data = await response.json();
         console.log('🔧 ContentManager: Response data:', data);
         // Refresh settings after update
-        fetchSettings();
+        await fetchSettings();
+        // Also trigger a global refresh by dispatching a custom event
+        window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: { key, value } }));
       } else {
         console.error('🔧 ContentManager: Failed to update setting');
+        alert('Failed to update setting. Please try again.');
       }
     } catch (error) {
       console.error(`🔧 ContentManager: Error updating setting ${key}:`, error);
+      alert('Failed to update setting. Please try again.');
     }
   };
 
