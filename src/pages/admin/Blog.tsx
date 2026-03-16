@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Trash2, Edit, Plus, Image as ImageIcon, X, Save, Upload } from 'lucide-react';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../../config/api';
 
 interface BlogPost {
   id: number;

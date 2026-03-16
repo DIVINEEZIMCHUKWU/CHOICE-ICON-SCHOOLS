@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Trash2, Upload, Image as ImageIcon, Video, Plus, Youtube } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../../config/api';
 
 interface GalleryImage {
   id: number;

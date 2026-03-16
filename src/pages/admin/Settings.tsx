@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Key, Save, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../../config/api';
 
 export default function Settings() {
   const [passwordData, setPasswordData] = useState({
