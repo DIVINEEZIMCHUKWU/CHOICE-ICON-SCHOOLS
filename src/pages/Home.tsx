@@ -408,12 +408,13 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300"
                 >
+                  {/* Event Image */}
                   {event.image_url && (
-                    <div className="h-48 overflow-hidden">
+                    <div className="h-48">
                       <img 
                         src={event.image_url} 
                         alt={event.title} 
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   )}

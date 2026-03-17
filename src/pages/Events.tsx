@@ -71,25 +71,37 @@ export default function Events() {
                 const { day, month, year } = formatDate(event.event_date);
                 return (
                   <div key={idx} className="flex flex-col sm:flex-row bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow">
-                    <div className={`bg-sky-blue text-white p-4 sm:p-6 sm:w-48 flex flex-col justify-center items-center text-center shrink-0`}>
-                      <Calendar size={32} className="mb-2 opacity-80" />
-                      <span className="text-3xl font-bold">{day}</span>
-                      <span className="text-sm uppercase tracking-wider font-medium">{month}</span>
-                      <span className="text-xs opacity-75 mt-1">{year}</span>
-                    </div>
-                    <div className="p-4 sm:p-6 md:p-8 flex-1">
-                      <h3 className="text-xl font-bold text-navy-blue mb-3">{event.title}</h3>
-                      <div className="flex flex-wrap gap-4 text-xs md:text-sm text-gray-500 mb-4">
-                        <div className="flex items-center gap-1">
-                          <Clock size={16} className="text-sky-blue" />
-                          {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin size={16} className="text-sky-blue" />
-                          {event.location}
-                        </div>
+                    {/* Event Image */}
+                    {event.image_url && (
+                      <div className="sm:w-48 h-48 sm:h-auto">
+                        <img 
+                          src={event.image_url} 
+                          alt={event.title} 
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <p className="text-gray-600 text-sm">{event.description}</p>
+                    )}
+                    <div className="flex-1">
+                      <div className="bg-sky-blue text-white p-4 sm:p-6 flex flex-col justify-center items-center text-center sm:w-48 shrink-0">
+                        <Calendar size={32} className="mb-2 opacity-80" />
+                        <span className="text-3xl font-bold">{day}</span>
+                        <span className="text-sm uppercase tracking-wider font-medium">{month}</span>
+                        <span className="text-xs opacity-75 mt-1">{year}</span>
+                      </div>
+                      <div className="p-4 sm:p-6 md:p-8">
+                        <h3 className="text-xl font-bold text-navy-blue mb-3">{event.title}</h3>
+                        <div className="flex flex-wrap gap-4 text-xs md:text-sm text-gray-500 mb-4">
+                          <div className="flex items-center gap-1">
+                            <Clock size={16} className="text-sky-blue" />
+                            {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MapPin size={16} className="text-sky-blue" />
+                            {event.location}
+                          </div>
+                        </div>
+                        <p className="text-gray-600 text-sm">{event.description}</p>
+                      </div>
                     </div>
                   </div>
                 );
