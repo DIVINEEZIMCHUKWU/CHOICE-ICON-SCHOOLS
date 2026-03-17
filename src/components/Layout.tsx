@@ -221,7 +221,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <div className="bg-gray-800 h-32 md:h-40 rounded-lg overflow-hidden relative group">
                 {/* Placeholder for map */}
                 <iframe 
-                  src="https://maps.google.com/maps?width=100%25&height=600&hl=en&q=Ogwashi-Uku,%20Delta%20State+(The%20Choice%20ICON%20Schools)&t=&z=14&ie=UTF8&iwloc=B&output=embed" 
+                  src="https://maps.google.com/maps?width=100%25&height=600&hl=en&q=maps.app.goo.gl/7XiAuwQxAfz8uDbM8+(The%20Choice%20ICON%20Schools)&t=&z=14&ie=UTF8&iwloc=B&output=embed" 
                   width="100%" 
                   height="100%" 
                   style={{border:0}} 
@@ -232,7 +232,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 ></iframe>
                 {/* Maps Button */}
                 <a 
-                  href="https://www.google.com/maps/place/The+Choice+ICON+Schools/@6.1861331,6.5262925,17z/data=!3m1!4b1!4m6!3m5!1s0x1043e5b50c4631a9:0xad0e881adb6e7881!8m2!3d6.1861331!4d6.5262925!16s%2Fg%2F11rsr5w5rr?entry=ttu&g_ep=EgoyMDI2MDMxMS4wIKXMDSoASAFQAw%3D%3D"
+                  href="https://maps.app.goo.gl/7XiAuwQxAfz8uDbM8"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-gray-800 px-2 py-1 sm:px-3 sm:py-1.5 rounded shadow-md transition-all duration-200 text-xs font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100"
