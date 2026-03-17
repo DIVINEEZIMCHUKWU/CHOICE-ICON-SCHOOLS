@@ -106,7 +106,7 @@ export default function Home() {
     { icon: <Award className="w-8 h-8 text-sky-blue" />, title: 'Qualitative Education' },
     { icon: <Monitor className="w-8 h-8 text-sky-blue" />, title: 'Well Equipped Science Laboratories' },
     { icon: <Heart className="w-8 h-8 text-sky-blue" />, title: 'Conducive and Serene Environment for learning' },
-    { icon: <Users className="w-8 h-8 text-sky-blue" />, title: 'Highly qualifies and motivated Staff' },
+    { icon: <Users className="w-8 h-8 text-sky-blue" />, title: 'Highly Qualified and Motivated Staff' },
     { icon: <Monitor className="w-8 h-8 text-sky-blue" />, title: 'State of the Art Computer Laboratory' },
     { icon: <Bus className="w-8 h-8 text-sky-blue" />, title: 'Efficient and effective transport system' },
     { icon: <Shield className="w-8 h-8 text-sky-blue" />, title: 'Well-equipped Healing Bay with Qualified Personnel' },
@@ -353,13 +353,13 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-6">Emmanuel M. Odiniya</h2>
                 <div className="text-gray-300 leading-relaxed mb-8 space-y-4 text-sm">
                   <p>
-                    "The Choice ICON Schools located in Ogwashi-uku, Delta State. A day schools that cut across Early Years, Nursery, Primary and Secondary. The Choice ICON Schools was founded in September, 2021. The founder of the Schools is an avid lover of education, value the social and emotional development of each child as they transit from their Early Years, Nursery, Primary and Secondary through early adolescence.
+                    "The Choice Icon Schools is located in Ogwashi-Uku, Delta State. It is a day school that cuts across Early years, Nursery, Primary, and Secondary sections .The Choice Icon Schools was founded in September, 2021.  The founder of the school is an avid lover of education who values the social and emotional development of each child as they transition from Early years, Nursery ,and Primary levels to Secondary through early adolescence .
                   </p>
                   <p>
-                    As a believer in teamwork, it is my responsibility to maintain and to continue to build a supportive and collaborative spirit at our great institution. Together as a school community, we will lay solid foundation to meet the challenges of the future in innovative and exciting ways.
+                    As a believer in teamwork, it is my responsibility to maintain and continue to build a supportive and collaborative spirit in our great institution. Together as a school community, we will lay a solid foundation to meet the challenges of the future in innovative and exciting ways.
                   </p>
                   <p>
-                    The Choice ICON Schools is defined by its motto: Grooming ICONS. Our motto anchor on academic excellence and partnering with parents in nurturing of sound minds and to encourage meaningful interaction between staff and learners and to become a leading international best practicing Schools of Choice."
+                    The Choice Icon Schools is defined by its motto: "Grooming ICONS". Our motto is anchored on academic excellence and partnership with parents in nurturing sound minds.  It also encourages meaningful interaction between staff and learners and aims to make the school a leading best standards in education."
                   </p>
                 </div>
               </div>

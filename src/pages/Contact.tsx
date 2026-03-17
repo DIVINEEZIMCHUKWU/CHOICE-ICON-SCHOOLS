@@ -260,7 +260,7 @@ export default function Contact() {
 
               <iframe 
 
-                src="https://maps.google.com/maps?width=100%25&height=600&hl=en&q=Ogwashi-Uku,%20Delta%20State+(The%20Choice%20ICON%20Schools)&t=&z=14&ie=UTF8&iwloc=B&output=embed" 
+                src="https://maps.google.com/maps?width=100%25&height=600&hl=en&q=ICON+Avenue+Off+Delta+State+Polytechnic+Road+Behind+Joanchim+Filling+Station+Ogwashi-Uku+Delta+State+Nigeria&output=embed" 
 
                 width="100%" 
 
@@ -278,7 +278,7 @@ export default function Contact() {
 
               {/* Open in Maps Button */}
               <a 
-                href="https://www.google.com/maps/place/The+Choice+ICON+Schools/@6.1861331,6.5262925,17z/data=!3m1!4b1!4m6!3m5!1s0x1043e5b50c4631a9:0xad0e881adb6e7881!8m2!3d6.1861331!4d6.5262925!16s%2Fg%2F11rsr5w5rr?entry=ttu&g_ep=EgoyMDI2MDMxMS4wIKXMDSoASAFQAw%3D%3D"
+                href="https://www.google.com/maps/search/ICON+Avenue+Off+Delta+State+Polytechnic+Road+Behind+Joanchim+Filling+Station+Ogwashi-Uku+Delta+State+Nigeria"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute bottom-4 right-4 bg-white hover:bg-gray-50 text-navy-blue px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-md transition-all duration-200 text-xs sm:text-sm font-medium flex items-center gap-2 hover:shadow-lg"
